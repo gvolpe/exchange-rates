@@ -15,18 +15,20 @@ import           Data.Text                      ( Text
 import           Network.Wreq
 
 showForex :: C.ForexConfig -> IO ()
-showForex c = makeReq path
+showForex c = makeReq ops url
  where
-  makeReq p = do
-    r <- get $ unpack (C.host c <> C.apiPath c <> p <> C.apiKey c)
+  makeReq ops url = do
+    r <- getWith ops url
     print $ r ^. responseBody
-  path = "/convert?q=USD_PLN,PLN_USD&compact=ultra&apiKey=" :: Text
+  url = unpack (C.host c <> C.apiPath c <> "/convert")
+  ops = defaults & param "q" .~ ["USD_PLN"] & param "compact" .~ ["ultra"] & param "apiKey" .~ [C.apiKey c]
 
 showApiUsage :: C.ForexConfig -> IO ()
-showApiUsage c = makeReq path
+showApiUsage c = makeReq ops url
  where
-  makeReq p = do
-    r <- get $ unpack (C.host c <> C.apiUsage c <> p <> C.apiKey c)
+  makeReq ops url = do
+    r <- getWith ops url
     print $ r ^. responseBody
-  path = "?apiKey=" :: Text
+  url = unpack (C.host c <> C.apiUsage c)
+  ops = defaults & param "apiKey" .~ [C.apiKey c]
 
