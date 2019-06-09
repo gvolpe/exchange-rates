@@ -21,10 +21,12 @@ extra-source-files:  CHANGELOG.md
 library
   exposed-modules:     Config
                      , Forex
+                     , RateLimiter
   build-depends:       base >= 4.7 && < 5
                      , dhall >= 1.24.0
                      , lens >= 4.17.1
                      , text
+                     , transient >= 0.6.3
                      , wreq >= 0.5.3.2
   hs-source-dirs:      src
   default-language:    Haskell2010
