@@ -1,6 +1,6 @@
 module RateLimiter
-  ( parTraverseN
-  , rateLimiter
+  ( parSequenceN
+  , parTraverseN
   )
 where
 
@@ -13,8 +13,8 @@ import           Transient.Base
 import           Transient.Indeterminism
 
 -- Sequence a list of computations in parallel just for the effects
-rateLimiter :: (Typeable a) => Int -> [IO a] -> IO ()
-rateLimiter n xs = void . keep' $ threads n (choose xs) >>= liftIO
+parSequenceN :: (Typeable a) => Int -> [IO a] -> IO ()
+parSequenceN n xs = void . keep' $ threads n (choose xs) >>= liftIO
 
 -- Traverse a list in parallel with a limit `n`
 parTraverseN :: (Typeable a) => Int -> (a -> IO b) -> [a] -> IO [b]

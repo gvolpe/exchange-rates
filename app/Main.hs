@@ -6,7 +6,7 @@ import           Data.Monoid                    ( (<>) )
 import           Forex                          ( showApiUsage
                                                 , showForex
                                                 )
-import           RateLimiter                    ( parTraverseN )
+import           RateLimiter
 
 f :: ForexConfig -> (Int -> IO Int)
 f c n = putStrLn ("Triggered #" <> show n) >> wait >> showApiUsage c >> pure n
