@@ -16,7 +16,7 @@ minutes n = Duration n Minutes
 hours :: Int -> Duration
 hours n = Duration n Hours
 
-toNanoSeconds :: Duration -> Int
-toNanoSeconds (Duration n Seconds) = n * 1000000
-toNanoSeconds (Duration n Minutes) = n * 60 * 1000000
-toNanoSeconds (Duration n Hours  ) = n * 60 * 60 * 1000000
+toMicroSeconds :: Duration -> Int
+toMicroSeconds (Duration n Seconds) = n * 1000000
+toMicroSeconds (Duration n Minutes) = n * 60 * 1000000
+toMicroSeconds (Duration n Hours  ) = n * 60 * 60 * 1000000

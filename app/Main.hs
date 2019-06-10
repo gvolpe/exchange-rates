@@ -7,29 +7,26 @@ import           Control.Monad.IO.Class         ( liftIO )
 import           Data.Functor                   ( void )
 import           Data.Monoid                    ( (<>) )
 import           Forex                          ( showApiUsage
-                                                , showForex
+                                                , callForex
                                                 )
 import           RateLimiter
 import           Time
 import           Transient.Base
+import           Transient.EVars
 import           Transient.Indeterminism
-
-f :: ForexConfig -> (Int -> IO Int)
-f c n = putStrLn ("Triggered #" <> show n) >> wait >> showApiUsage c >> pure n
-  where wait = threadDelay (1000000 * 3)
 
 main :: IO ()
 main = do
   c <- loadConfig
   print c
-  rateLimiter (hours 1) 100 (showForex $ forex c)
+  showRates $ forex c
 
---showStuff :: ForexConfig -> IO ()
---showStuff c = void . keep' $ do
---  let f = rateLimiter (hours 1) 100 (showForex c)
---  let g = threadDelay (1000000 * 5) >> putStrLn "5 seconds..." >> g :: IO ()
---  rs <- (,) <$> async f <*> async g
---  liftIO $ print rs
-
-  --results <- parTraverseN 4 (f $ forex c) [1 .. 10]
-  --print results
+showRates :: ForexConfig -> IO ()
+showRates c = void . keep' $ do
+  var <- newEVar :: TransIO (EVar String)
+  let f = rateLimiter (hours 1) 1000 (callForex c) (lastWriteEVar var)
+  let g = sleep 2 >> readEVar var >>= liftIO . print >> g :: TransIO ()
+  let h = async (showApiUsage c) >> sleep 5 >> h :: TransIO ()
+  f <|> g <|> h
+ where
+  sleep n = liftIO $ threadDelay (1000000 * n) :: TransIO ()
