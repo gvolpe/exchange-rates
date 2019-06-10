@@ -18,7 +18,7 @@ import           Transient.Indeterminism
 type RateLimit = Int
 
 -- Evaluate a computation every certain amount of time while not exceeding a given rate limit
--- and perform an action (publisher) on the obtained `a`.
+-- and perform an action on every obtained `a`.
 --
 -- eg. given:
 --   1. an `IO a` that represents a remote API call
@@ -26,10 +26,10 @@ type RateLimit = Int
 --
 -- this function will make a call every 36 seconds asynchronously.
 rateLimiter :: (Typeable a) => Duration -> RateLimit -> IO a -> (a -> TransIO ()) -> TransIO ()
-rateLimiter duration rate fa publisher = f
+rateLimiter duration rate fa action = f
  where
   n = toMicroSeconds duration `div` rate
-  f = async fa >>= publisher >> liftIO (threadDelay n) >> f :: TransIO ()
+  f = async fa >>= action >> liftIO (threadDelay n) >> f :: TransIO ()
 
 -- Sequence a list of computations in parallel just for the effects
 parSequenceN :: (Typeable a) => Int -> [IO a] -> IO ()
