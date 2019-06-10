@@ -6,15 +6,15 @@ import           Data.Monoid                    ( (<>) )
 import           Forex                          ( showApiUsage
                                                 , showForex
                                                 )
-import           RateLimiter                    ( rateLimiter )
+import           RateLimiter                    ( parTraverseN )
 
-wait :: IO ()
-wait = threadDelay (1000000 * 5)
+f :: ForexConfig -> (Int -> IO Int)
+f c n = putStrLn ("Triggered #" <> show n) >> wait >> showApiUsage c >> pure n
+  where wait = threadDelay (1000000 * 3)
 
 main :: IO ()
 main = do
   c <- loadConfig
   print c
-  rateLimiter 2 $ map
-    (\n -> putStrLn ("Triggered #" <> show n) >> wait >> showApiUsage (forex c))
-    [1 .. 10]
+  results <- parTraverseN 4 (f $ forex c) [1 .. 10]
+  print results
