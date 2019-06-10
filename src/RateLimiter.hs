@@ -11,24 +11,26 @@ import           Control.Monad.IO.Class         ( liftIO )
 import           Data.Functor                   ( void )
 import           Data.IORef
 import           Data.Typeable                  ( Typeable )
+import           Refined
 import           Time
 import           Transient.Base
 import           Transient.Indeterminism
 
-type RateLimit = Int
+type RateLimit = Refined Positive Int
 
--- Evaluate a computation every certain amount of time while not exceeding a given rate limit
--- and perform an action on every obtained `a`.
---
--- eg. given:
---   1. an `IO a` that represents a remote API call
---   2. a rate limit of 100 calls per hour
---
--- this function will make a call every 36 seconds asynchronously.
+{- Evaluate a computation every certain amount of time while not exceeding a given rate limit
+   and perform an action on every obtained `a`.
+
+   eg. given:
+     1. an `IO a` that represents a remote API call
+     2. a rate limit of 100 calls per hour
+
+   This function will make a call every 36 seconds asynchronously.
+-}
 rateLimiter :: (Typeable a) => Duration -> RateLimit -> IO a -> (a -> TransIO ()) -> TransIO ()
 rateLimiter duration rate fa action = f
  where
-  n = toMicroSeconds duration `div` rate
+  n = toMicroSeconds duration `div` unrefine rate
   f = async fa >>= action >> liftIO (threadDelay n) >> f :: TransIO ()
 
 -- Sequence a list of computations in parallel just for the effects

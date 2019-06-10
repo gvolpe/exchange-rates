@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Forex
-  ( showApiUsage
-  , callForex
+  ( callForex
+  , showApiUsage
   )
 where
 
