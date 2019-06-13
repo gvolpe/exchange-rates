@@ -19,12 +19,15 @@ build-type:          Simple
 extra-source-files:  CHANGELOG.md
 
 library
-  exposed-modules:     Config
+  exposed-modules:     Cache
+                     , Config
                      , Forex
                      , RateLimiter
                      , Time
   build-depends:       base >= 4.7 && < 5
+                     , bytestring >= 0.10.8.2
                      , dhall >= 1.24.0
+                     , hedis >= 0.12.5
                      , lens >= 4.17.1
                      , refined >= 0.4.2.1
                      , text

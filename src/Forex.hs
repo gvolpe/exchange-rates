@@ -20,7 +20,7 @@ callForex c = makeReq ops url
   makeReq ops url = do
     r <- getWith ops url
     pure . show $ r ^. responseBody
-  url = unpack (C.host c <> C.apiPath c <> "/convert")
+  url = unpack (C.apiHost c <> C.apiPath c <> "/convert")
   ops = defaults & param "q" .~ ["USD_PLN"] & param "compact" .~ ["ultra"] & param "apiKey" .~ [C.apiKey c]
 
 showApiUsage :: C.ForexConfig -> IO ()
@@ -29,5 +29,5 @@ showApiUsage c = makeReq ops url
   makeReq ops url = do
     r <- getWith ops url
     print $ r ^. responseBody
-  url = unpack (C.host c <> C.apiUsage c)
+  url = unpack (C.apiHost c <> C.apiUsage c)
   ops = defaults & param "apiKey" .~ [C.apiKey c]

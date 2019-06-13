@@ -2,6 +2,7 @@
 
 module Main where
 
+import           Cache                          ( redisTest )
 import           Config
 import           Control.Applicative            ( (<|>) )
 import           Control.Concurrent             ( threadDelay )
@@ -22,6 +23,7 @@ main :: IO ()
 main = do
   c <- loadConfig
   print c
+  redisTest $ redis c
   showRates $ forex c
 
 showRates :: ForexConfig -> IO ()
