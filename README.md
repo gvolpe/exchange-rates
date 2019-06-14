@@ -1,6 +1,8 @@
 exchange-rates
 ==============
 
+[![CircleCI](https://circleci.com/gh/gvolpe/exchange-rates.svg?style=svg)](https://circleci.com/gh/gvolpe/exchange-rates)
+
 Querying a [rate-limited foreign currency exchange API](https://free.currencyconverterapi.com/) using [wreq](http://hackage.haskell.org/package/wreq), [hedis](https://github.com/informatikr/hedis) and [transient](http://hackage.haskell.org/package/transient).
 
 Rates are cached in Redis for 20 minutes (configurable) to avoid hitting the web serivce too often.
