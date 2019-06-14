@@ -2,13 +2,14 @@
 
 module Main where
 
-import           Cache                          ( redisTest )
+import           CachedForex                    ( exchangeRate )
 import           Config
 import           Control.Applicative            ( (<|>) )
 import           Control.Concurrent             ( threadDelay )
 import           Control.Monad.IO.Class         ( liftIO )
 import           Data.Functor                   ( void )
 import           Data.Monoid                    ( (<>) )
+import           Data.Foldable                  ( traverse_ )
 import           Domain
 import           Forex                          ( showApiUsage
                                                 , callForex
@@ -24,10 +25,10 @@ main :: IO ()
 main = do
   c <- loadConfig
   print c
-  redisTest $ redis c
-  --showRates $ forex c
-  r <- callForex (forex c) USD ARS
-  print r
+  showApiUsage $ forex c
+  let rates = [(USD, ARS), (EUR, PLN), (USD, ARS), (EUR, GBP), (EUR, PLN)]
+  traverse_ (\(from, to) -> exchangeRate c from to >>= print) rates
+  showApiUsage $ forex c
 
 showRates :: ForexConfig -> IO ()
 showRates c = void . keep' $ do
