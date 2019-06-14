@@ -1,0 +1,12 @@
+version: 2.1
+
+orbs:
+  haskell: haskell-works/haskell-build@1.6.18
+
+workflows:
+  build_app:
+    jobs:
+      - haskell/build:
+          name: GHC 8.6.4
+          executor: haskell/ghc-8_6_4
+          cabal-file: exchange-rates.cabal
