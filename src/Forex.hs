@@ -18,8 +18,6 @@ import           Domain
 import           GHC.Generics (Generic)
 import           Network.Wreq
 
-newtype Exchange = Exchange { value :: Float } deriving Show
-
 instance FromJSON Exchange where
   parseJSON v = do
    j <- parseJSON v :: Parser (Map Text Value)
