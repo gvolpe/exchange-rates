@@ -2,7 +2,7 @@
 
 module Forex
   ( callForex
-  , showApiUsage
+  , getApiUsage
   )
 where
 
@@ -24,6 +24,8 @@ instance FromJSON Exchange where
    case M.toList j of
      [(_, x)] -> Exchange <$> (parseJSON x :: Parser Float)
 
+instance FromJSON ApiUsage
+
 callForex :: C.ForexConfig -> Currency -> Currency -> IO Exchange
 callForex c from to = makeReq ops url
  where
@@ -33,11 +35,10 @@ callForex c from to = makeReq ops url
   exc = [pack $ show from <> "_" <> show to]
   ops = defaults & param "q" .~ exc & param "compact" .~ ["ultra"] & param "apiKey" .~ [C.apiKey c]
 
-showApiUsage :: C.ForexConfig -> IO ()
-showApiUsage c = makeReq ops url
+getApiUsage :: C.ForexConfig -> IO ApiUsage
+getApiUsage c = makeReq ops url
  where
-  makeReq ops url = do
-    r <- getWith ops url
-    print $ r ^. responseBody
+  makeReq ops url =
+    (^. responseBody) <$> (asJSON =<< getWith ops url :: IO (Response ApiUsage))
   url = unpack (C.apiHost c <> C.apiUsage c)
   ops = defaults & param "apiKey" .~ [C.apiKey c]

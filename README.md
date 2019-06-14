@@ -25,7 +25,7 @@ And then run the app with `cabal new-run`, you should see something like:
 ```
 AppConfig {forex = ForexConfig {host = "https://free.currconv.com/api/v7", apiKey = [SECRET]}, redis = RedisConfig {redisHost = "127.0.0.1", redisPort = 6379}}
 
-"{\"timestamp\":\"2019-06-14T18:35:18.369Z\",\"usage\":13}"
+ApiUsage {timestamp = "2019-06-14T19:25:43.748Z", usage = 6}
 Calling web service for: USD -> ARS
 Exchange {value = 43.963104}
 Calling web service for: EUR -> PLN
@@ -36,5 +36,5 @@ Calling web service for: EUR -> GBP
 Exchange {value = 0.890276}
 Cache hit: EUR -> PLN
 Exchange {value = 4.256994}
-"{\"timestamp\":\"2019-06-14T18:35:20.628Z\",\"usage\":16}"
+ApiUsage {timestamp = "2019-06-14T19:25:46.301Z", usage = 9}
 ```
