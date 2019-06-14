@@ -25,10 +25,10 @@ main :: IO ()
 main = do
   c <- loadConfig
   print c
-  (getApiUsage $ forex c) >>= print
+  getApiUsage (forex c) >>= print
   let rates = [(USD, ARS), (EUR, PLN), (USD, ARS), (EUR, GBP), (EUR, PLN)]
   traverse_ (\(from, to) -> exchangeRate c from to >>= print) rates
-  (getApiUsage $ forex c) >>= print
+  getApiUsage (forex c) >>= print
 
 showRates :: ForexConfig -> IO ()
 showRates c = void . keep' $ do
