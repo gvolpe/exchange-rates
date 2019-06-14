@@ -1,3 +1,5 @@
+{-# LANGUAGE BlockArguments, LambdaCase #-}
+
 module CachedForex
   ( exchangeRate
   )
@@ -13,12 +15,10 @@ showEx :: Currency -> Currency -> String
 showEx from to = show from <> " -> " <> show to
 
 exchangeRate :: C.AppConfig -> Currency -> Currency -> IO Exchange
-exchangeRate c from to = do
-  cr <- cachedExchange (C.redis c) from to  -- TODO: Use lambda case ?
-  case cr of
-    Just x  -> putStrLn ("Cache hit: " <> showEx from to) >> pure x
-    Nothing -> do
-      putStrLn $ "Calling web service for: " <> showEx from to
-      rs <- callForex (C.forex c) from to
-      cacheNewResult (C.redis c) from to rs
-      pure rs
+exchangeRate c from to = cachedExchange (C.redis c) from to >>= \case
+  Just x  -> putStrLn ("Cache hit: " <> showEx from to) >> pure x
+  Nothing -> do
+    putStrLn $ "Calling web service for: " <> showEx from to
+    rs <- callForex (C.forex c) from to
+    cacheNewResult (C.redis c) from to rs
+    pure rs
