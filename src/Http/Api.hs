@@ -32,7 +32,7 @@ exAPI :: Proxy ExchangeAPI
 exAPI = Proxy
 
 server1 :: Server ExchangeAPI
-server1 = (\f t -> return Exchange { value = 1.3 })
+server1 = (\f t -> return Exchange { getExchange = 1.3 })
   :<|>    return [USD, EUR, ARS]
 
 app1 :: Application

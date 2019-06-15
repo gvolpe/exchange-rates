@@ -14,7 +14,7 @@ data ApiUsage = ApiUsage
   , usage :: Int
   } deriving (Generic, Show)
 
-newtype Exchange = Exchange { value :: Float } deriving (Generic, Show)
+newtype Exchange = Exchange { getExchange :: Float } deriving (Generic, Show)
 
 data Currency = USD | EUR | GBP | AUD | CAD | PLN | ARS deriving (Generic, Enum, Show)
 

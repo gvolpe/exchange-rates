@@ -1,11 +1,11 @@
 module Time where
 
-data TimeUnit = Seconds | Minutes | Hours deriving (Show)
+data TimeUnit = Seconds | Minutes | Hours deriving Show
 
 data Duration = Duration
   { unit :: Int
   , timeunit :: TimeUnit
-  } deriving (Show)
+  } deriving Show
 
 seconds :: Int -> Duration
 seconds n = Duration n Seconds

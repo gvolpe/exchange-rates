@@ -1,7 +1,8 @@
 {-# LANGUAGE BlockArguments, LambdaCase #-}
 
 module Cache.Cache
-  ( RedisCache(..)
+  ( Expiration(..)
+  , RedisCache(..)
   , mkRedisCache
   )
 where
@@ -17,8 +18,11 @@ import           Data.Text                      ( unpack )
 import           Database.Redis
 import           Domain
 
+-- Represents expiration of cached keys in seconds
+newtype Expiration = Expiration { getExpiration :: Int } deriving Show
+
 data RedisCache = RedisCache
-  { cacheNewResult :: Currency -> Currency -> Exchange -> IO ()
+  { cacheNewResult :: Expiration -> Currency -> Currency -> Exchange -> IO ()
   , cachedExchange :: Currency -> Currency -> IO (Maybe Exchange)
   }
 
@@ -30,14 +34,15 @@ mkRedisCache cfg =
                           }
         )
 
-cacheNewResult' :: Connection -> Currency -> Currency -> Exchange -> IO ()
-cacheNewResult' conn from to ex = runRedis conn $ do
+cacheNewResult'
+  :: Connection -> Expiration -> Currency -> Currency -> Exchange -> IO ()
+cacheNewResult' conn x from to ex = runRedis conn $ do
   hset k f v
   void $ expire k (60 * 20) -- expire in 20 minutes
  where
   k = BS.pack $ show from
   f = BS.pack $ show to
-  v = BS.pack . show $ value ex
+  v = BS.pack . show $ getExchange ex
 
 cachedExchange' :: Connection -> Currency -> Currency -> IO (Maybe Exchange)
 cachedExchange' conn from to =

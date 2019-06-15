@@ -5,12 +5,17 @@ module Service.CachedForex
   )
 where
 
-import           Cache.Cache                    ( RedisCache(..) )
-import           Config                         ( ForexConfig )
+import           Cache.Cache                    ( RedisCache(..)
+                                                , Expiration(..)
+                                                )
+import           Config                         ( ForexConfig
+                                                , keyExpiration
+                                                )
 import           Control.Exception              ( bracket )
 import           Data.Monoid                    ( (<>) )
 import           Database.Redis                 ( Connection )
 import           Domain
+import           GHC.Natural                    ( naturalToInt )
 import           Http.Forex
 
 showEx :: Currency -> Currency -> String
@@ -23,5 +28,6 @@ exchangeRate c cfg from to = cachedExchange c from to >>= \case
     putStrLn $ "Calling web service for: " <> showEx from to
     bracket remoteCall cacheResult pure
    where
-    remoteCall  = callForex cfg from to
-    cacheResult = cacheNewResult c from to
+    exp = Expiration { getExpiration = naturalToInt $ keyExpiration cfg }
+    remoteCall = callForex cfg from to
+    cacheResult = cacheNewResult c exp from to
