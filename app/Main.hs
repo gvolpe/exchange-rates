@@ -2,7 +2,8 @@
 
 module Main where
 
-import           CachedForex                    ( exchangeRate )
+import           Cache.Cache                    ( mkRedisCache )
+import           Concurrency.RateLimiter
 import           Config
 import           Control.Applicative            ( (<|>) )
 import           Control.Concurrent             ( threadDelay )
@@ -11,11 +12,11 @@ import           Data.Functor                   ( void )
 import           Data.Monoid                    ( (<>) )
 import           Data.Foldable                  ( traverse_ )
 import           Domain
-import           Forex                          ( callForex
+import           Http.Forex                     ( callForex
                                                 , getApiUsage
                                                 )
-import           RateLimiter
 import           Refined
+import           Service.CachedForex            ( exchangeRate )
 import           Time
 import           Transient.Base
 import           Transient.EVars
@@ -25,10 +26,12 @@ main :: IO ()
 main = do
   c <- loadConfig
   print c
-  getApiUsage (forex c) >>= print
+  cache <- mkRedisCache $ redis c
+  showApiUsage c
   let rates = [(USD, ARS), (EUR, PLN), (USD, ARS), (EUR, GBP), (EUR, PLN)]
-  traverse_ (\(from, to) -> exchangeRate c from to >>= print) rates
-  getApiUsage (forex c) >>= print
+  traverse_ (\(from, to) -> exchangeRate cache (forex c) from to >>= print) rates
+  showApiUsage c
+  where showApiUsage c = getApiUsage (forex c) >>= print
 
 showRates :: ForexConfig -> IO ()
 showRates c = void . keep' $ do

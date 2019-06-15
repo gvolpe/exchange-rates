@@ -1,26 +1,27 @@
 {-# LANGUAGE BlockArguments, LambdaCase #-}
 
-module CachedForex
+module Service.CachedForex
   ( exchangeRate
   )
 where
 
-import           Cache
-import qualified Config                        as C
+import           Cache.Cache                    ( RedisCache(..) )
+import           Config                         ( ForexConfig )
 import           Control.Exception              ( bracket )
 import           Data.Monoid                    ( (<>) )
+import           Database.Redis                 ( Connection )
 import           Domain
-import           Forex
+import           Http.Forex
 
 showEx :: Currency -> Currency -> String
 showEx from to = show from <> " -> " <> show to
 
-exchangeRate :: C.AppConfig -> Currency -> Currency -> IO Exchange
-exchangeRate c from to = cachedExchange (C.redis c) from to >>= \case
+exchangeRate :: RedisCache -> ForexConfig -> Currency -> Currency -> IO Exchange
+exchangeRate c cfg from to = cachedExchange c from to >>= \case
   Just x  -> putStrLn ("Cache hit: " <> showEx from to) >> pure x
   Nothing -> do
     putStrLn $ "Calling web service for: " <> showEx from to
     bracket remoteCall cacheResult pure
    where
-    remoteCall  = callForex (C.forex c) from to
-    cacheResult = cacheNewResult (C.redis c) from to
+    remoteCall  = callForex cfg from to
+    cacheResult = cacheNewResult c from to

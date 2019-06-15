@@ -4,7 +4,7 @@ data TimeUnit = Seconds | Minutes | Hours deriving (Show)
 
 data Duration = Duration
   { unit :: Int
-  , timeUnit :: TimeUnit
+  , timeunit :: TimeUnit
   } deriving (Show)
 
 seconds :: Int -> Duration

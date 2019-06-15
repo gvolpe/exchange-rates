@@ -11,4 +11,4 @@ data ApiUsage = ApiUsage
 
 newtype Exchange = Exchange { value :: Float } deriving Show
 
-data Currency = USD | EUR | GBP | PLN | ARS deriving Show
+data Currency = USD | EUR | GBP | AUD | CAD | PLN | ARS deriving Show

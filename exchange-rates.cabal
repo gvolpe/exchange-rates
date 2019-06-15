@@ -19,12 +19,13 @@ build-type:          Simple
 extra-source-files:  CHANGELOG.md
 
 library
-  exposed-modules:     Cache
-                     , CachedForex
+  exposed-modules:     Cache.Cache
+                     , Cache.RedisClient
+                     , Concurrency.RateLimiter
                      , Config
                      , Domain
-                     , Forex
-                     , RateLimiter
+                     , Http.Forex
+                     , Service.CachedForex
                      , Time
   build-depends:       base >= 4.7 && < 5
                      , aeson >= 1.2.1.0

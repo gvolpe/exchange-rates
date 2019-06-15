@@ -1,4 +1,4 @@
-module RateLimiter
+module Concurrency.RateLimiter
   ( RateLimit
   , parSequenceN
   , parTraverseN

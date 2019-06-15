@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings, RankNTypes, ScopedTypeVariables #-}
 
-module Forex
+module Http.Forex
   ( callForex
   , getApiUsage
   )
