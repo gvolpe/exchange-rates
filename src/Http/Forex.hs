@@ -8,7 +8,7 @@ where
 
 import qualified Config                        as C
 import           Control.Lens
-import           Data.Aeson
+import           Data.Aeson              hiding ( Options )
 import           Data.Aeson.Types        hiding ( Options )
 import           Data.Map                       ( Map )
 import qualified Data.Map                      as M

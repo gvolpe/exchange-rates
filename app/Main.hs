@@ -12,6 +12,7 @@ import           Data.Functor                   ( void )
 import           Data.Monoid                    ( (<>) )
 import           Data.Foldable                  ( traverse_ )
 import           Domain
+import           Http.Api                       ( runServer )
 import           Http.Forex                     ( callForex
                                                 , getApiUsage
                                                 )
@@ -23,7 +24,10 @@ import           Transient.EVars
 import           Transient.Indeterminism
 
 main :: IO ()
-main = do
+main = runServer
+
+main1 :: IO ()
+main1 = do
   c <- loadConfig
   print c
   let fc = forex c
