@@ -26,12 +26,14 @@ main :: IO ()
 main = do
   c <- loadConfig
   print c
+  let fc = forex c
   cache <- mkRedisCache $ redis c
-  showApiUsage c
-  let rates = [(USD, ARS), (EUR, PLN), (USD, ARS), (EUR, GBP), (EUR, PLN)]
-  traverse_ (\(from, to) -> exchangeRate cache (forex c) from to >>= print) rates
-  showApiUsage c
-  where showApiUsage c = getApiUsage (forex c) >>= print
+  showApiUsage fc
+  traverse_ (\(from, to) -> exchangeRate cache fc from to >>= print) rates
+  showApiUsage fc
+ where
+  showApiUsage fc = getApiUsage fc >>= print
+  rates = [(USD, ARS), (EUR, PLN), (USD, ARS), (EUR, GBP), (EUR, PLN)]
 
 showRates :: ForexConfig -> IO ()
 showRates c = void . keep' $ do
