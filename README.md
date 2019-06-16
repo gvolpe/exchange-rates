@@ -5,12 +5,7 @@ exchange-rates
 
 Querying a [rate-limited foreign currency exchange API](https://free.currencyconverterapi.com/) using [Redis](https://redis.io/) as a cache.
 
-### Rate Limits of the Free API
-
-- Conversion Pairs per Request: 2
 - Number of Requests per Hour: 100
-- Date Range in History: 8 Days
-- Allowed Back in History: 1 Year(s)
 
 ### Http Endpoints
 
