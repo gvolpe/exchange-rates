@@ -42,8 +42,6 @@ And then run the web server app using `cabal new-run`, you should see something 
 
 ```
 AppConfig {forex = ForexConfig {host = "https://free.currconv.com/api/v7", apiKey = [SECRET]}, redis = RedisConfig {redisHost = "127.0.0.1", redisPort = 6379}}
-
-AppConfig {forex = ForexConfig {host = "https://free.currconv.com/api/v7", apiKey = [SECRET]}, redis = RedisConfig {redisHost = "127.0.0.1", redisPort = 6379}}
 Started server on localhost:8080
 Calling web service for: USD -> GBP
 Calling web service for: USD -> EUR
