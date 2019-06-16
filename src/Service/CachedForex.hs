@@ -16,7 +16,7 @@ import           Control.Exception              ( bracket )
 import           Data.Monoid                    ( (<>) )
 import           Database.Redis                 ( Connection )
 import           Domain
-import           GHC.Natural                    ( naturalToInt )
+import           GHC.Natural                    ( naturalToInteger )
 import           Http.Forex
 
 newtype ExchangeService = ExchangeService
@@ -34,7 +34,7 @@ getRate' c cfg from to = cachedExchange c from to >>= \case
     putStrLn $ "Calling web service for: " <> showEx from to
     bracket remoteCall cacheResult pure
    where
-    exp = Expiration { getExpiration = naturalToInt $ keyExpiration cfg }
+    exp = Expiration { getExpiration = naturalToInteger $ keyExpiration cfg }
     remoteCall = callForex cfg from to
     cacheResult = cacheNewResult c exp from to
 

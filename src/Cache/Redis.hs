@@ -19,7 +19,7 @@ import           Domain
 import           GHC.Natural                    ( naturalToInteger )
 
 -- Represents expiration of cached keys in seconds
-newtype Expiration = Expiration { getExpiration :: Int } deriving Show
+newtype Expiration = Expiration { getExpiration :: Integer } deriving Show
 
 data Cache = Cache
   { cacheNewResult :: Expiration -> Currency -> Currency -> Exchange -> IO ()
@@ -38,7 +38,7 @@ cacheNewResult'
   :: Connection -> Expiration -> Currency -> Currency -> Exchange -> IO ()
 cacheNewResult' conn x from to ex = runRedis conn $ do
   hset k f v
-  void $ expire k (60 * 20) -- expire in 20 minutes
+  void $ expire k (getExpiration x)
  where
   k = BS.pack $ show from
   f = BS.pack $ show to

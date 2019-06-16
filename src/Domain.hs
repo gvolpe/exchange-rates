@@ -16,6 +16,12 @@ data ApiUsage = ApiUsage
 
 newtype Exchange = Exchange { getExchange :: Float } deriving (Generic, Show)
 
+data ExchangeResponse = ExchangeResponse
+  { rate :: Float
+  , from :: Currency
+  , to :: Currency
+  } deriving (Generic, Show)
+
 data Currency = USD | EUR | GBP | AUD | CAD | PLN | ARS deriving (Generic, Enum, Show)
 
 currencies :: [Currency]
