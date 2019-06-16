@@ -3,9 +3,7 @@ exchange-rates
 
 [![CircleCI](https://circleci.com/gh/gvolpe/exchange-rates.svg?style=svg)](https://circleci.com/gh/gvolpe/exchange-rates)
 
-Querying a [rate-limited foreign currency exchange API](https://free.currencyconverterapi.com/) using [wreq](http://hackage.haskell.org/package/wreq), [hedis](https://github.com/informatikr/hedis) and [transient](http://hackage.haskell.org/package/transient).
-
-Rates are cached in Redis for 20 minutes (configurable) to avoid hitting the web serivce too often.
+Querying a [rate-limited foreign currency exchange API](https://free.currencyconverterapi.com/) using [Redis](https://redis.io/) as a cache.
 
 ### Rate Limits of the Free API
 
@@ -14,29 +12,44 @@ Rates are cached in Redis for 20 minutes (configurable) to avoid hitting the web
 - Date Range in History: 8 Days
 - Allowed Back in History: 1 Year(s)
 
+### Http Endpoints
+
+#### GET /v1/currencies
+
+Returns a list of the available currencies. Eg:
+
+```json
+["USD","EUR","GBP","AUD","CAD","PLN","ARS"]
+```
+
+#### GET /v1/rates?from=EUR&to=USD
+
+Returns the current exchange rate, if available:
+
+```json
+{"to":"GBP","from":"USD","rate":0.794065}
+```
+
 ### Run it locally
 
-You'll need a Redis instance. Easiest way is to run it with `docker`:
+You'll need a Redis instance. The easiest way to get started is by using `docker`:
 
 ```
 docker run -p 6379:6379 redis:5.0.0
 ```
 
-And then run the app with `cabal new-run`, you should see something like:
+And then run the web server app using `cabal new-run`, you should see something like:
 
 ```
 AppConfig {forex = ForexConfig {host = "https://free.currconv.com/api/v7", apiKey = [SECRET]}, redis = RedisConfig {redisHost = "127.0.0.1", redisPort = 6379}}
 
-ApiUsage {timestamp = "2019-06-14T19:25:43.748Z", usage = 6}
-Calling web service for: USD -> ARS
-Exchange {value = 43.963104}
-Calling web service for: EUR -> PLN
-Exchange {value = 4.256994}
-Cache hit: USD -> ARS
-Exchange {value = 43.963104}
-Calling web service for: EUR -> GBP
-Exchange {value = 0.890276}
-Cache hit: EUR -> PLN
-Exchange {value = 4.256994}
-ApiUsage {timestamp = "2019-06-14T19:25:46.301Z", usage = 9}
+AppConfig {forex = ForexConfig {host = "https://free.currconv.com/api/v7", apiKey = [SECRET]}, redis = RedisConfig {redisHost = "127.0.0.1", redisPort = 6379}}
+Started server on localhost:8080
+Calling web service for: USD -> GBP
+Calling web service for: USD -> EUR
+Cache hit: USD -> GBP
+Calling web service for: USD -> PLN
+Cache hit: USD -> PLN
 ```
+
+Exchange rates are cached to avoid hitting the (limite) external service many times and lose the quote.
