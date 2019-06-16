@@ -17,23 +17,30 @@ import           Http.Forex                     ( callForex
                                                 , getApiUsage
                                                 )
 import           Refined
-import           Service.CachedForex            ( exchangeRate )
+import           Service.CachedForex            ( ExchangeService(..)
+                                                , mkExchangeService
+                                                )
 import           Time
 import           Transient.Base
 import           Transient.EVars
 import           Transient.Indeterminism
+import           Utils                          ( (>>>) )
 
 main :: IO ()
-main = runServer
+main = do
+  c <- loadConfig >>> print
+  cache   <- mkRedisCache $ redis c
+  service <- mkExchangeService cache (forex c)
+  runServer service
 
 main1 :: IO ()
 main1 = do
-  c <- loadConfig
-  print c
+  c <- loadConfig >>> print
   let fc = forex c
-  cache <- mkRedisCache $ redis c
+  cache   <- mkRedisCache $ redis c
+  service <- mkExchangeService cache fc
   showApiUsage fc
-  traverse_ (\(from, to) -> exchangeRate cache fc from to >>= print) rates
+  traverse_ (\(from, to) -> getRate service from to >>= print) rates
   showApiUsage fc
  where
   showApiUsage fc = getApiUsage fc >>= print
@@ -42,7 +49,10 @@ main1 = do
 showRates :: ForexConfig -> IO ()
 showRates c = void . keep' $ do
   var <- newEVar :: TransIO (EVar Exchange)
-  let f = rateLimiter (hours 1) $$(refineTH 1000) (callForex c USD PLN) (lastWriteEVar var)
+  let f = rateLimiter (hours 1)
+                      $$(refineTH 1000)
+                      (callForex c USD PLN)
+                      (lastWriteEVar var)
   let g = sleep 2 >> readEVar var >>= liftIO . print >> g :: TransIO ()
   let h = async (getApiUsage c >>= print) >> sleep 5 >> h :: TransIO ()
   f <|> g <|> h

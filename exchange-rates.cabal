@@ -26,8 +26,10 @@ library
                      , Domain
                      , Http.Api
                      , Http.Forex
+                     , Http.Routes
                      , Service.CachedForex
                      , Time
+                     , Utils
   build-depends:       base >= 4.7 && < 5
                      , aeson >= 1.2.1.0
                      , bytestring >= 0.10.8.2

@@ -1,7 +1,8 @@
 {-# LANGUAGE BlockArguments, LambdaCase #-}
 
 module Service.CachedForex
-  ( exchangeRate
+  ( ExchangeService(..)
+  , mkExchangeService
   )
 where
 
@@ -18,11 +19,16 @@ import           Domain
 import           GHC.Natural                    ( naturalToInt )
 import           Http.Forex
 
-showEx :: Currency -> Currency -> String
-showEx from to = show from <> " -> " <> show to
+newtype ExchangeService = ExchangeService
+  { getRate :: Currency -> Currency -> IO Exchange
+  }
 
-exchangeRate :: RedisCache -> ForexConfig -> Currency -> Currency -> IO Exchange
-exchangeRate c cfg from to = cachedExchange c from to >>= \case
+mkExchangeService :: RedisCache -> ForexConfig -> IO ExchangeService
+mkExchangeService cache cfg =
+  pure ExchangeService { getRate = getRate' cache cfg }
+
+getRate' :: RedisCache -> ForexConfig -> Currency -> Currency -> IO Exchange
+getRate' c cfg from to = cachedExchange c from to >>= \case
   Just x  -> putStrLn ("Cache hit: " <> showEx from to) >> pure x
   Nothing -> do
     putStrLn $ "Calling web service for: " <> showEx from to
@@ -31,3 +37,6 @@ exchangeRate c cfg from to = cachedExchange c from to >>= \case
     exp = Expiration { getExpiration = naturalToInt $ keyExpiration cfg }
     remoteCall = callForex cfg from to
     cacheResult = cacheNewResult c exp from to
+
+showEx :: Currency -> Currency -> String
+showEx from to = show from <> " -> " <> show to
