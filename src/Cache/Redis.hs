@@ -1,13 +1,12 @@
 {-# LANGUAGE BlockArguments, LambdaCase #-}
 
-module Cache.Cache
-  ( Expiration(..)
-  , RedisCache(..)
+module Cache.Redis
+  ( Cache(..)
+  , Expiration(..)
   , mkRedisCache
   )
 where
 
-import           Cache.RedisClient              ( redisConnect )
 import           Config
 import           Control.Monad.IO.Class         ( liftIO )
 import qualified Data.ByteString.Char8         as BS
@@ -17,21 +16,22 @@ import           Data.Functor                   ( (<&>)
 import           Data.Text                      ( unpack )
 import           Database.Redis
 import           Domain
+import           GHC.Natural                    ( naturalToInteger )
 
 -- Represents expiration of cached keys in seconds
 newtype Expiration = Expiration { getExpiration :: Int } deriving Show
 
-data RedisCache = RedisCache
+data Cache = Cache
   { cacheNewResult :: Expiration -> Currency -> Currency -> Exchange -> IO ()
   , cachedExchange :: Currency -> Currency -> IO (Maybe Exchange)
   }
 
-mkRedisCache :: RedisConfig -> IO RedisCache
+mkRedisCache :: RedisConfig -> IO Cache
 mkRedisCache cfg =
   redisConnect cfg
-    <&> (\c -> RedisCache { cacheNewResult = cacheNewResult' c
-                          , cachedExchange = cachedExchange' c
-                          }
+    <&> (\c -> Cache { cacheNewResult = cacheNewResult' c
+                     , cachedExchange = cachedExchange' c
+                     }
         )
 
 cacheNewResult'
@@ -49,3 +49,12 @@ cachedExchange' conn from to =
   runRedis conn (hget (BS.pack $ show from) (BS.pack $ show to)) <&> \case
     Right (Just x) -> Just $ Exchange (read $ BS.unpack x :: Float)
     _              -> Nothing
+
+-- Redis connection --
+connInfo c = defaultConnectInfo
+  { connectHost = unpack $ redisHost c
+  , connectPort = PortNumber (fromInteger . naturalToInteger $ redisPort c)
+  }
+
+redisConnect :: RedisConfig -> IO Connection
+redisConnect = checkedConnect . connInfo

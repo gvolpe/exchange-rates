@@ -19,8 +19,7 @@ build-type:          Simple
 extra-source-files:  CHANGELOG.md
 
 library
-  exposed-modules:     Cache.Cache
-                     , Cache.RedisClient
+  exposed-modules:     Cache.Redis
                      , Concurrency.RateLimiter
                      , Config
                      , Domain

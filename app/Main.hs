@@ -2,7 +2,7 @@
 
 module Main where
 
-import           Cache.Cache                    ( mkRedisCache )
+import           Cache.Redis                    ( mkRedisCache )
 import           Concurrency.RateLimiter
 import           Config
 import           Control.Applicative            ( (<|>) )

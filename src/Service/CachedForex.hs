@@ -6,7 +6,7 @@ module Service.CachedForex
   )
 where
 
-import           Cache.Cache                    ( RedisCache(..)
+import           Cache.Redis                    ( Cache(..)
                                                 , Expiration(..)
                                                 )
 import           Config                         ( ForexConfig
@@ -23,11 +23,11 @@ newtype ExchangeService = ExchangeService
   { getRate :: Currency -> Currency -> IO Exchange
   }
 
-mkExchangeService :: RedisCache -> ForexConfig -> IO ExchangeService
+mkExchangeService :: Cache -> ForexConfig -> IO ExchangeService
 mkExchangeService cache cfg =
   pure ExchangeService { getRate = getRate' cache cfg }
 
-getRate' :: RedisCache -> ForexConfig -> Currency -> Currency -> IO Exchange
+getRate' :: Cache -> ForexConfig -> Currency -> Currency -> IO Exchange
 getRate' c cfg from to = cachedExchange c from to >>= \case
   Just x  -> putStrLn ("Cache hit: " <> showEx from to) >> pure x
   Nothing -> do
