@@ -14,7 +14,10 @@ import           Data.Map                       ( Map )
 import qualified Data.Map                      as M
 import           Data.Monoid                    ( (<>) )
 import           Data.Text
-import           Domain
+import           Domain.Currency                ( Currency )
+import           Domain.Model                   ( ApiUsage
+                                                , Exchange(..)
+                                                )
 import           GHC.Generics                   ( Generic )
 import           Network.Wreq
 

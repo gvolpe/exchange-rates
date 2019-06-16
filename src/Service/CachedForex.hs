@@ -15,7 +15,8 @@ import           Config                         ( ForexConfig
 import           Control.Exception              ( bracket )
 import           Data.Monoid                    ( (<>) )
 import           Database.Redis                 ( Connection )
-import           Domain
+import           Domain.Currency                ( Currency )
+import           Domain.Model                   ( Exchange )
 import           GHC.Natural                    ( naturalToInteger )
 import           Http.Forex
 

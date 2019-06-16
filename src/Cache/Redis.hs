@@ -15,7 +15,8 @@ import           Data.Functor                   ( (<&>)
                                                 )
 import           Data.Text                      ( unpack )
 import           Database.Redis
-import           Domain
+import           Domain.Currency                ( Currency )
+import           Domain.Model                   ( Exchange(..) )
 import           GHC.Natural                    ( naturalToInteger )
 
 -- Represents expiration of cached keys in seconds

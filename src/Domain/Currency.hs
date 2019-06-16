@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Domain where
+module Domain.Currency where
 
 import           Data.List                      ( elemIndex )
 import           Data.Text                      ( Text
@@ -8,19 +8,6 @@ import           Data.Text                      ( Text
                                                 , pack
                                                 )
 import           GHC.Generics                   ( Generic )
-
-data ApiUsage = ApiUsage
-  { timestamp :: String
-  , usage :: Int
-  } deriving (Generic, Show)
-
-newtype Exchange = Exchange { getExchange :: Float } deriving (Generic, Show)
-
-data ExchangeResponse = ExchangeResponse
-  { rate :: Float
-  , from :: Currency
-  , to :: Currency
-  } deriving (Generic, Show)
 
 data Currency = USD | EUR | GBP | AUD | CAD | PLN | ARS deriving (Generic, Enum, Show)
 

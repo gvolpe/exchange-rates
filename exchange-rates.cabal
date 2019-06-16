@@ -22,9 +22,11 @@ library
   exposed-modules:     Cache.Redis
                      , Concurrency.RateLimiter
                      , Config
-                     , Domain
+                     , Domain.Currency
+                     , Domain.Model
                      , Http.Api
                      , Http.Forex
+                     , Http.Responses
                      , Http.Routes
                      , Service.CachedForex
                      , Time
