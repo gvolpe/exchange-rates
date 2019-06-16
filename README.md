@@ -50,4 +50,4 @@ Calling web service for: USD -> PLN
 Cache hit: USD -> PLN
 ```
 
-Exchange rates are cached to avoid hitting the (limite) external service many times and lose the quote.
+Exchange rates are cached to avoid hitting the (limited) external service many times.
