@@ -53,8 +53,10 @@ test-Suite exchange-rates-tests
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Main.hs
-  other-modules:       Rates.UtilsTest
+  other-modules:       Rates.CachedForexTest
+                     , Rates.UtilsTest
   build-depends:       base >= 4.7 && < 5
+                     , containers
                      , exchange-rates
                      , hedgehog >= 1.0
                      , template-haskell

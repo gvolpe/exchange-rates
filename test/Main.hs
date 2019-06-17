@@ -4,10 +4,10 @@ module Main where
 
 import           Data.Functor                   ( void )
 import           Hedgehog
+import           Rates.CachedForexTest
 import           Rates.UtilsTest
 
-tests :: IO Bool
-tests = checkParallel tapTests
-
 main :: IO ()
-main = void tests
+main = do
+  void $ checkParallel tapTests
+  void $ checkParallel cachedForexServiceTests
