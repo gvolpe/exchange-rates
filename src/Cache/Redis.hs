@@ -2,7 +2,6 @@
 
 module Cache.Redis
   ( Cache(..)
-  , Expiration(..)
   , mkRedisCache
   )
 where
@@ -16,18 +15,17 @@ import           Data.Functor                   ( (<&>)
 import           Data.Text                      ( unpack )
 import           Database.Redis
 import           Domain.Currency                ( Currency )
-import           Domain.Model                   ( Exchange(..) )
+import           Domain.Model                   ( Exchange(..)
+                                                , Expiration(..)
+                                                )
 import           GHC.Natural                    ( naturalToInteger )
 
--- Represents expiration of cached keys in seconds
-newtype Expiration = Expiration { getExpiration :: Integer } deriving Show
-
-data Cache = Cache
-  { cacheNewResult :: Expiration -> Currency -> Currency -> Exchange -> IO ()
-  , cachedExchange :: Currency -> Currency -> IO (Maybe Exchange)
+data Cache m = Cache
+  { cacheNewResult :: Expiration -> Currency -> Currency -> Exchange -> m ()
+  , cachedExchange :: Currency -> Currency -> m (Maybe Exchange)
   }
 
-mkRedisCache :: RedisConfig -> IO Cache
+mkRedisCache :: RedisConfig -> IO (Cache IO)
 mkRedisCache cfg =
   redisConnect cfg
     <&> (\c -> Cache { cacheNewResult = cacheNewResult' c

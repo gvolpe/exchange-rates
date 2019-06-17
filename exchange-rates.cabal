@@ -25,7 +25,7 @@ library
                      , Domain.Currency
                      , Domain.Model
                      , Http.Api
-                     , Http.Forex
+                     , Http.Client.Forex
                      , Http.Responses
                      , Http.Routes
                      , Service.CachedForex

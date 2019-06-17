@@ -43,4 +43,3 @@ instance Interpret AppConfig
 
 loadConfig :: IO AppConfig
 loadConfig = input auto "./config/app.dhall"
-

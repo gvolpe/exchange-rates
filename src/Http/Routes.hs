@@ -19,7 +19,7 @@ exchangeToResponse :: Currency -> Currency -> Exchange -> ExchangeResponse
 exchangeToResponse from to rate = ExchangeResponse (getExchange rate) from to
 
 rates
-  :: ExchangeService
+  :: ExchangeService IO
   -> Maybe Currency
   -> Maybe Currency
   -> Handler ExchangeResponse

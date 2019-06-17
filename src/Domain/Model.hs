@@ -11,3 +11,6 @@ data ApiUsage = ApiUsage
   } deriving (Generic, Show)
 
 newtype Exchange = Exchange { getExchange :: Float } deriving Show
+
+-- Represents expiration of cached keys in seconds
+newtype Expiration = Expiration { getExpiration :: Integer } deriving Show

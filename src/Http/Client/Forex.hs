@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings, RankNTypes, ScopedTypeVariables #-}
 
-module Http.Forex
-  ( callForex
-  , getApiUsage
+module Http.Client.Forex
+  ( ForexClient(..)
+  , mkForexClient
   )
 where
 
@@ -17,8 +17,10 @@ import           Data.Text
 import           Domain.Currency                ( Currency )
 import           Domain.Model                   ( ApiUsage
                                                 , Exchange(..)
+                                                , Expiration(..)
                                                 )
 import           GHC.Generics                   ( Generic )
+import           GHC.Natural                    ( naturalToInteger )
 import           Network.Wreq
 
 instance FromJSON Exchange where
@@ -29,16 +31,29 @@ instance FromJSON Exchange where
 
 instance FromJSON ApiUsage
 
-callForex :: C.ForexConfig -> Currency -> Currency -> IO Exchange
-callForex c from to =
+data ForexClient m = ForexClient
+  { callForex :: Currency -> Currency -> m Exchange
+  , getApiUsage :: m ApiUsage
+  , expiration :: Expiration
+  }
+
+mkForexClient :: C.ForexConfig -> IO (ForexClient IO)
+mkForexClient cfg = pure ForexClient
+  { callForex   = callForex' cfg
+  , getApiUsage = getApiUsage' cfg
+  , expiration  = Expiration (naturalToInteger $ C.keyExpiration cfg)
+  }
+
+callForex' :: C.ForexConfig -> Currency -> Currency -> IO Exchange
+callForex' c from to =
   let url = C.apiHost c <> C.apiPath c <> "/convert"
       exc = param "q" .~ [pack $ show from <> "_" <> show to]
       key = param "apiKey" .~ [C.apiKey c]
       ops = defaults & exc & param "compact" .~ ["ultra"] & key
   in  req ops url
 
-getApiUsage :: C.ForexConfig -> IO ApiUsage
-getApiUsage c =
+getApiUsage' :: C.ForexConfig -> IO ApiUsage
+getApiUsage' c =
   let url = C.apiHost c <> C.apiUsage c
       ops = defaults & param "apiKey" .~ [C.apiKey c]
   in  req ops url

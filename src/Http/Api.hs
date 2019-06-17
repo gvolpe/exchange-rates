@@ -30,13 +30,13 @@ type RatesAPI =
 ratesAPI :: Proxy RatesAPI
 ratesAPI = Proxy
 
-exchangeServer :: ExchangeService -> Server RatesAPI
+exchangeServer :: ExchangeService IO -> Server RatesAPI
 exchangeServer s = Routes.rates s :<|> return currencies
 
-api :: ExchangeService -> Application
+api :: ExchangeService IO -> Application
 api s = serve ratesAPI (exchangeServer s)
 
-runServer :: ExchangeService -> IO ()
+runServer :: ExchangeService IO -> IO ()
 runServer s = do
   putStrLn "Started server on localhost:8080"
   run 8080 (api s)
