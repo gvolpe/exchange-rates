@@ -28,6 +28,7 @@ library
                      , Http.Client.Forex
                      , Http.Responses
                      , Http.Routes
+                     , Logger
                      , Service.CachedForex
                      , Time
                      , Utils

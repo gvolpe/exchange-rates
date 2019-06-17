@@ -4,6 +4,7 @@ import           Cache.Redis                    ( mkRedisCache )
 import           Config
 import           Http.Api                       ( runServer )
 import           Http.Client.Forex              ( mkForexClient )
+import           Logger                         ( mkLogger )
 import           Service.CachedForex            ( mkExchangeService )
 import           Utils                          ( (>>>) )
 
@@ -12,5 +13,6 @@ main = do
   cfg     <- loadConfig >>> print
   cache   <- mkRedisCache $ redis cfg
   client  <- mkForexClient $ forex cfg
-  service <- mkExchangeService cache client
+  logger  <- mkLogger
+  service <- mkExchangeService logger cache client
   runServer service

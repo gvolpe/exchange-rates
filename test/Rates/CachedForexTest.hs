@@ -6,7 +6,9 @@ module Rates.CachedForexTest
 where
 
 import           Cache.Redis                    ( Cache(..) )
-import           Data.Functor                   ( (<&>), void )
+import           Data.Functor                   ( (<&>)
+                                                , void
+                                                )
 import           Data.IORef
 import           Data.Map                       ( Map )
 import qualified Data.Map                      as Map
@@ -14,6 +16,7 @@ import           Domain.Currency
 import           Domain.Model                   ( Expiration(..)
                                                 , Exchange(..)
                                                 )
+import           Logger                         ( Logger(..) )
 import           Hedgehog
 import qualified Hedgehog.Gen                  as Gen
 import           Http.Client.Forex              ( ForexClient(..) )
@@ -23,20 +26,23 @@ import           Prelude                 hiding ( head
 import           Service.CachedForex            ( ExchangeService(..)
                                                 , mkExchangeService
                                                 )
+import           Utils                          ( unit )
 
-type Ref = IORef (Map (Currency, Currency) Exchange)
+type TestCache = IORef (Map (Currency, Currency) Exchange)
 
 testCacheNewResult
-  :: Ref -> Expiration -> Currency -> Currency -> Exchange -> IO ()
+  :: TestCache -> Expiration -> Currency -> Currency -> Exchange -> IO ()
 testCacheNewResult ref _ from to rate =
   void $ atomicModifyIORef ref (\m -> (m, Map.insert (from, to) rate))
 
-testCachedExchange :: Ref -> Currency -> Currency -> IO (Maybe Exchange)
-testCachedExchange ref from to = readIORef ref <&> (Map.lookup (from, to))
+testCachedExchange :: TestCache -> Currency -> Currency -> IO (Maybe Exchange)
+testCachedExchange ref from to = do
+  cached <- Map.lookup (from, to) <$> readIORef ref
+  pure $ (const $ Exchange 2.0) <$> cached
 
 mkTestCache :: IO (Cache IO)
 mkTestCache =
-  (newIORef Map.empty :: IO Ref)
+  (newIORef Map.empty :: IO TestCache)
     <&> (\ref -> Cache { cacheNewResult = testCacheNewResult ref
                        , cachedExchange = testCachedExchange ref
                        }
@@ -51,12 +57,15 @@ testForexClient = ForexClient { callForex   = testCallForex
                               , expiration  = undefined
                               }
 
+testLogger :: Logger IO
+testLogger = Logger (const unit)
+
 prop_get_rates :: Property
-prop_get_rates = property $ do
+prop_get_rates = withTests 1000 $ property $ do
+  cache   <- evalIO mkTestCache
+  service <- evalIO $ mkExchangeService testLogger cache testForexClient
   from    <- forAll $ Gen.element currencies
   to      <- forAll $ Gen.element currencies
-  cache   <- evalIO mkTestCache
-  service <- evalIO $ mkExchangeService cache testForexClient
   result  <- evalIO $ getRate service from to
   result === Exchange 1.0
 
