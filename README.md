@@ -1,5 +1,4 @@
-exchange-rates
-==============
+# ![icon](icon.png) exchange-rates
 
 [![CircleCI](https://circleci.com/gh/gvolpe/exchange-rates.svg?style=svg)](https://circleci.com/gh/gvolpe/exchange-rates)
 
