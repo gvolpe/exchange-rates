@@ -14,7 +14,9 @@ import qualified Hedgehog.Range                as Range
 import           Prelude                 hiding ( head
                                                 , last
                                                 )
-import           Utils                          ( (>>>) )
+import           Utils                          ( (>>>)
+                                                , unit
+                                                )
 
 prop_tap_maybe :: Property
 prop_tap_maybe = property $ do
@@ -24,7 +26,7 @@ prop_tap_maybe = property $ do
 prop_tap_io :: Property
 prop_tap_io = property $ do
   x <- forAll Gen.alpha
-  y <- evalIO $ pure x >>> (\_ -> pure ())
+  y <- evalIO $ pure x >>> const unit
   x === y
 
 tapTests :: Group
