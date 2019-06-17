@@ -10,6 +10,7 @@ import           Cache.Redis                    ( Cache(..) )
 import           Config                         ( ForexConfig
                                                 , keyExpiration
                                                 )
+import           Context
 import           Control.Exception              ( bracket )
 import           Data.Monoid                    ( (<>) )
 import           Database.Redis                 ( Connection )
@@ -18,15 +19,21 @@ import           Domain.Model                   ( Exchange )
 import           Logger                         ( Logger(..) )
 import           GHC.Natural                    ( naturalToInteger )
 import           Http.Client.Forex
+import           RIO                     hiding ( bracket
+                                                , logInfo
+                                                )
 
 newtype ExchangeService m = ExchangeService
   { getRate :: Currency -> Currency -> m Exchange
   }
 
--- TODO: Consider using RIO
 mkExchangeService
-  :: Logger IO -> Cache IO -> ForexClient IO -> IO (ExchangeService IO)
-mkExchangeService logger cache client =
+  :: (HasLogger ctx, HasCache ctx, HasForexClient ctx)
+  => RIO ctx (ExchangeService IO)
+mkExchangeService = do
+  logger <- view loggerL
+  cache  <- view cacheL
+  client <- view forexClientL
   pure ExchangeService { getRate = getRate' logger cache client }
 
 getRate'

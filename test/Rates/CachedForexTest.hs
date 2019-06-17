@@ -6,6 +6,7 @@ module Rates.CachedForexTest
 where
 
 import           Cache.Redis                    ( Cache(..) )
+import           Context                        ( Ctx(..) )
 import           Data.Functor                   ( (<&>)
                                                 , void
                                                 )
@@ -22,6 +23,11 @@ import qualified Hedgehog.Gen                  as Gen
 import           Http.Client.Forex              ( ForexClient(..) )
 import           Prelude                 hiding ( head
                                                 , last
+                                                )
+import           RIO                     hiding ( atomicModifyIORef
+                                                , newIORef
+                                                , readIORef
+                                                , to
                                                 )
 import           Service.CachedForex            ( ExchangeService(..)
                                                 , mkExchangeService
@@ -62,8 +68,9 @@ testLogger = Logger (const unit)
 
 prop_get_rates :: Property
 prop_get_rates = withTests 1000 $ property $ do
-  cache   <- evalIO mkTestCache
-  service <- evalIO $ mkExchangeService testLogger cache testForexClient
+  cache <- evalIO mkTestCache
+  let ctx = Ctx testLogger cache testForexClient
+  service <- evalIO $ runRIO ctx mkExchangeService
   from    <- forAll $ Gen.element currencies
   to      <- forAll $ Gen.element currencies
   result  <- evalIO $ getRate service from to
