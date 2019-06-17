@@ -33,10 +33,10 @@ You'll need a Redis instance. The easiest way to get started is by using `docker
 docker run -p 6379:6379 redis:5.0.0
 ```
 
-And then run the web server app using `cabal new-run`, you should see something like:
+And then run the web server app using `cabal new-run exchange-rates`, you should see something like:
 
 ```
-AppConfig {forex = ForexConfig {host = "https://free.currconv.com/api/v7", apiKey = [SECRET]}, redis = RedisConfig {redisHost = "127.0.0.1", redisPort = 6379}}
+AppConfig {forex = ForexConfig {host = "https://free.currconv.com/api/v7", apiKey = [SECRET], keyExpiration = 1800}, redis = RedisConfig {redisHost = "127.0.0.1", redisPort = 6379}}
 Started server on localhost:8080
 Calling web service for: USD -> GBP
 Calling web service for: USD -> EUR

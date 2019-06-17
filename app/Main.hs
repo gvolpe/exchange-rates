@@ -3,9 +3,7 @@ module Main where
 import           Cache.Redis                    ( mkRedisCache )
 import           Config
 import           Http.Api                       ( runServer )
-import           Service.CachedForex            ( ExchangeService(..)
-                                                , mkExchangeService
-                                                )
+import           Service.CachedForex            ( mkExchangeService )
 import           Utils                          ( (>>>) )
 
 main :: IO ()

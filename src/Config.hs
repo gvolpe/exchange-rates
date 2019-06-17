@@ -33,7 +33,9 @@ instance Show ForexConfig where
   show c =
     "ForexConfig {host = \""
       ++ unpack (apiHost c <> apiPath c)
-      ++ "\", apiKey = [SECRET]}"
+      ++ "\", apiKey = [SECRET], keyExpiration = "
+      ++ show (keyExpiration c)
+      ++ "}"
 
 instance Interpret ForexConfig
 instance Interpret RedisConfig
