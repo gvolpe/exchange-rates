@@ -46,7 +46,9 @@ Cache hit: USD -> PLN
 
 Exchange rates are cached to avoid hitting the (limited) external service many times.
 
-### Browsing the documentation
+### Browse the documentation
+
+The docs are generated at compile time from the API definition. The API serves a `swagger.json` response that you can visualize in the Swagger UI:
 
 ```
 docker run -p 80:8080 swaggerapi/swagger-ui
