@@ -11,7 +11,9 @@ import           Config                         ( ForexConfig
                                                 , keyExpiration
                                                 )
 import           Context
-import           Control.Exception              ( bracket )
+import           Control.Monad.Catch            ( MonadMask
+                                                , bracket
+                                                )
 import           Data.Interface                 ( ExchangeService(..) )
 import           Data.Monoid                    ( (<>) )
 import           Database.Redis                 ( Connection )
@@ -34,12 +36,13 @@ mkExchangeService = do
   pure ExchangeService { getRate = getRate' logger cache client }
 
 getRate'
-  :: Logger IO
-  -> Cache IO
-  -> ForexClient IO
+  :: MonadMask m
+  => Logger m
+  -> Cache m
+  -> ForexClient m
   -> Currency
   -> Currency
-  -> IO Exchange
+  -> m Exchange
 getRate' l cache client from to = cachedExchange cache from to >>= \case
   Just x  -> logInfo l ("Cache hit: " <> showEx from to) >> pure x
   Nothing -> do
