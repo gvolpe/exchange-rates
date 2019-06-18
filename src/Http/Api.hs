@@ -10,6 +10,7 @@
 
 module Http.Api (runServer) where
 
+import           Control.Lens
 import           Data.Text
 import           Data.Aeson
 import           Data.Monoid                    ( (<>) )
@@ -46,6 +47,10 @@ type RatesAPI =
 
 apiSwagger :: Swagger
 apiSwagger = toSwagger (Proxy :: Proxy RatesAPI)
+  & info.title   .~ "Exchange Rates API"
+  & info.version .~ "1.0"
+  & info.description ?~ "Exchange rates for everyone!"
+  & info.license ?~ ("Apache 2" & url ?~ URL "https://www.apache.org/licenses/LICENSE-2.0")
 
 type API = SwaggerAPI :<|> RatesAPI
 
