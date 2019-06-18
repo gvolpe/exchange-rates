@@ -45,3 +45,13 @@ Cache hit: USD -> PLN
 ```
 
 Exchange rates are cached to avoid hitting the (limited) external service many times.
+
+### Browsing the documentation
+
+```
+docker run -p 80:8080 swaggerapi/swagger-ui
+```
+
+Go to `localhost` and enter `http://localhost:8080/swagger.json`.
+
+![docs](docs.png)
