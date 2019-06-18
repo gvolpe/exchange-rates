@@ -13,15 +13,15 @@ import           Servant.API
 import           Service.CachedForex            ( ExchangeService(..) )
 import           Network.Wai
 import           Network.Wai.Handler.Warp
+import           Utils                          (maybeToEither)
 
 type ApiVersion = "v1"
 
 instance FromJSON Currency
 
 instance FromHttpApiData Currency where
-  parseQueryParam x = case parseCurrency x of
-    Just v  -> Right v
-    Nothing -> Left $ "Invalid currency: " <> x
+  parseQueryParam x =
+    maybeToEither ("Invalid currency: " <> x) (parseCurrency x)
 
 type RatesAPI =
        ApiVersion :> "rates" :> QueryParam "from" Currency :> QueryParam "to" Currency :> Get '[JSON] ExchangeResponse
