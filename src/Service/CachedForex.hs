@@ -12,6 +12,7 @@ import           Config                         ( ForexConfig
                                                 )
 import           Context
 import           Control.Exception              ( bracket )
+import           Data.Interface                 ( ExchangeService(..) )
 import           Data.Monoid                    ( (<>) )
 import           Database.Redis                 ( Connection )
 import           Domain.Currency                ( Currency )
@@ -22,10 +23,6 @@ import           Http.Client.Forex
 import           RIO                     hiding ( bracket
                                                 , logInfo
                                                 )
-
-newtype ExchangeService m = ExchangeService
-  { getRate :: Currency -> Currency -> m Exchange
-  }
 
 mkExchangeService
   :: (HasLogger ctx, HasCache ctx, HasForexClient ctx)

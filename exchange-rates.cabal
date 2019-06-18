@@ -23,6 +23,7 @@ library
                      , Concurrency.RateLimiter
                      , Config
                      , Context
+                     , Data.Interface
                      , Domain.Currency
                      , Domain.Model
                      , Http.Api

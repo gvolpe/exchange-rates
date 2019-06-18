@@ -7,11 +7,13 @@ module Cache.Redis
 where
 
 import           Config
+import           Context
 import           Control.Monad.IO.Class         ( liftIO )
 import qualified Data.ByteString.Char8         as BS
 import           Data.Functor                   ( (<&>)
                                                 , void
                                                 )
+import           Data.Interface                 ( Cache(..) )
 import           Data.Text                      ( unpack )
 import           Database.Redis
 import           Domain.Currency                ( Currency )
@@ -19,19 +21,15 @@ import           Domain.Model                   ( Exchange(..)
                                                 , Expiration(..)
                                                 )
 import           GHC.Natural                    ( naturalToInteger )
+import           RIO
 
-data Cache m = Cache
-  { cacheNewResult :: Expiration -> Currency -> Currency -> Exchange -> m ()
-  , cachedExchange :: Currency -> Currency -> m (Maybe Exchange)
-  }
-
-mkRedisCache :: RedisConfig -> IO (Cache IO)
-mkRedisCache cfg =
-  redisConnect cfg
-    <&> (\c -> Cache { cacheNewResult = cacheNewResult' c
-                     , cachedExchange = cachedExchange' c
-                     }
-        )
+mkRedisCache :: HasRedisConfig env => RIO env (Cache IO)
+mkRedisCache = do
+  cfg <- view redisConfigL
+  con <- liftIO $ redisConnect cfg
+  pure Cache { cacheNewResult = cacheNewResult' con
+             , cachedExchange = cachedExchange' con
+             }
 
 cacheNewResult'
   :: Connection -> Expiration -> Currency -> Currency -> Exchange -> IO ()
