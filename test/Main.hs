@@ -9,5 +9,6 @@ import           Rates.UtilsTest
 
 main :: IO ()
 main = do
+  forexTests <- cachedForexServiceTests
   void $ checkParallel tapTests
-  void $ checkParallel cachedForexServiceTests
+  void $ checkParallel forexTests

@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
 
 module Rates.CachedForexTest
   ( cachedForexServiceTests
@@ -7,12 +7,10 @@ where
 
 import           Cache.Redis                    ( Cache(..) )
 import           Context                        ( Ctx(..) )
-import           Data.Functor                   ( (<&>)
-                                                , void
-                                                )
 import           Data.IORef
 import           Data.Map                       ( Map )
 import qualified Data.Map                      as Map
+import           Data.Maybe                     ( fromMaybe )
 import           Domain.Currency
 import           Domain.Model                   ( Expiration(..)
                                                 , Exchange(..)
@@ -39,12 +37,12 @@ type TestCache = IORef (Map (Currency, Currency) Exchange)
 testCacheNewResult
   :: TestCache -> Expiration -> Currency -> Currency -> Exchange -> IO ()
 testCacheNewResult ref _ from to rate =
-  void $ atomicModifyIORef ref (\m -> (m, Map.insert (from, to) rate))
+  atomicModifyIORef ref (\m -> (Map.insert (from, to) rate m, ()))
 
 testCachedExchange :: TestCache -> Currency -> Currency -> IO (Maybe Exchange)
 testCachedExchange ref from to = do
   cached <- Map.lookup (from, to) <$> readIORef ref
-  pure $ (const $ Exchange 2.0) <$> cached
+  pure (Exchange 2.0 <$ cached)
 
 mkTestCache :: IO (Cache IO)
 mkTestCache =
@@ -66,15 +64,19 @@ testForexClient = ForexClient { callForex   = testCallForex
 testLogger :: Logger IO
 testLogger = Logger (const unit)
 
-prop_get_rates :: Property
-prop_get_rates = withTests 1000 $ property $ do
-  cache <- evalIO mkTestCache
+prop_get_rates :: Cache IO -> Property
+prop_get_rates cache = withTests 1000 $ property $ do
   let ctx = Ctx testLogger cache testForexClient
   service <- evalIO $ runRIO ctx mkExchangeService
   from    <- forAll $ Gen.element currencies
   to      <- forAll $ Gen.element currencies
+  cached  <- evalIO $ cachedExchange cache from to
   result  <- evalIO $ getRate service from to
-  result === Exchange 1.0
+  result === fromMaybe (Exchange 1.0) cached
 
-cachedForexServiceTests :: Group
-cachedForexServiceTests = $$(discover)
+cachedForexServiceTests :: IO Group
+cachedForexServiceTests =
+  mkTestCache
+    <&> (\c ->
+          Group "Rates.CachedForexTest" [("prop_get_rates", prop_get_rates c)]
+        )
