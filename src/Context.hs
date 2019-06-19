@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances, FunctionalDependencies, MultiParamTypeClasses #-}
+
 module Context where
 
 import           Config                         ( AppConfig(..)
@@ -10,30 +12,30 @@ import           Data.Interface                 ( Cache
 import           Logger                         ( Logger )
 import           RIO
 
-data Ctx = Ctx
-  { getLogger :: Logger IO
-  , getCache :: Cache IO
-  , getForexClient :: ForexClient IO
+data Ctx m = Ctx
+  { getLogger :: Logger m
+  , getCache :: Cache m
+  , getForexClient :: ForexClient m
   }
 
 newtype Env = Env { getAppConfig :: AppConfig }
 
-class HasLogger ctx where
-  loggerL :: Lens' ctx (Logger IO)
+class HasLogger ctx m | ctx -> m where
+  loggerL :: Lens' ctx (Logger m)
 
-instance HasLogger Ctx where
+instance Monad m => HasLogger (Ctx m) m where
   loggerL = lens getLogger (\x y -> x { getLogger = y })
 
-class HasCache ctx where
-  cacheL :: Lens' ctx (Cache IO)
+class HasCache ctx m | ctx -> m where
+  cacheL :: Lens' ctx (Cache m)
 
-instance HasCache Ctx where
+instance Monad m => HasCache (Ctx m) m where
   cacheL = lens getCache (\x y -> x { getCache = y })
 
-class HasForexClient ctx where
-  forexClientL :: Lens' ctx (ForexClient IO)
+class HasForexClient ctx m | ctx -> m where
+  forexClientL :: Lens' ctx (ForexClient m)
 
-instance HasForexClient Ctx where
+instance Monad m => HasForexClient (Ctx m) m where
   forexClientL = lens getForexClient (\x y -> x { getForexClient = y })
 
 class HasAppConfig env where

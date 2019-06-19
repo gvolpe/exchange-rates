@@ -11,9 +11,11 @@ import           Config                         ( ForexConfig
                                                 , keyExpiration
                                                 )
 import           Context
+import           Control.Lens                   ( view )
 import           Control.Monad.Catch            ( MonadMask
                                                 , bracket
                                                 )
+import           Control.Monad.Reader.Class     ( MonadReader(..) )
 import           Data.Interface                 ( ExchangeService(..) )
 import           Data.Monoid                    ( (<>) )
 import           Database.Redis                 ( Connection )
@@ -21,19 +23,21 @@ import           Domain.Currency                ( Currency )
 import           Domain.Model                   ( Exchange )
 import           Logger                         ( Logger(..) )
 import           GHC.Natural                    ( naturalToInteger )
-import           Http.Client.Forex
-import           RIO                     hiding ( bracket
-                                                , logInfo
-                                                )
+import           Http.Client.Forex              ( ForexClient(..) )
 
 mkExchangeService
-  :: (HasLogger ctx, HasCache ctx, HasForexClient ctx)
-  => RIO ctx (ExchangeService IO)
+  :: ( MonadMask m
+     , HasLogger ctx m
+     , HasCache ctx m
+     , HasForexClient ctx m
+     , MonadReader ctx r
+     )
+  => r (ExchangeService m)
 mkExchangeService = do
   logger <- view loggerL
   cache  <- view cacheL
   client <- view forexClientL
-  pure ExchangeService { getRate = getRate' logger cache client }
+  pure $ ExchangeService { getRate = getRate' logger cache client }
 
 getRate'
   :: MonadMask m

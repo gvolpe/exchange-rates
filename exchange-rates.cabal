@@ -42,6 +42,7 @@ library
                      , exceptions >= 0.10.2
                      , hedis >= 0.12.5
                      , lens >= 4.17.1
+                     , mtl >= 2.2.2
                      , refined >= 0.4.2.1
                      , rio >= 0.1.9.2
                      , servant >= 0.14.1

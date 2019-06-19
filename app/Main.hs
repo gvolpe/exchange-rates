@@ -10,7 +10,7 @@ import           RIO                     hiding ( (>>>) )
 import           Service.CachedForex            ( mkExchangeService )
 import           Utils                          ( (>>>) )
 
-mkContext :: RIO Env Ctx
+mkContext :: RIO Env (Ctx IO)
 mkContext = do
   cache <- mkRedisCache
   Ctx defaultLogger cache <$> mkForexClient

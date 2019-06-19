@@ -32,7 +32,7 @@ instance FromJSON Exchange where
   parseJSON v = do
     j <- parseJSON v :: Parser (Map Text Value)
     case M.toList j of
-      [(_, x)] -> Exchange <$> (parseJSON x :: Parser Float)
+      [(_, x)] -> Exchange <$> (parseJSON x :: Parser Rational)
 
 instance FromJSON ApiUsage
 

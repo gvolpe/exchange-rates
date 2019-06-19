@@ -16,7 +16,7 @@ import           Service.CachedForex            ( ExchangeService(..)
                                                 )
 
 exchangeToResponse :: Currency -> Currency -> Exchange -> ExchangeResponse
-exchangeToResponse from to rate = ExchangeResponse (getExchange rate) from to
+exchangeToResponse from to rate = ExchangeResponse (fromRational $ getExchange rate) from to
 
 rates
   :: ExchangeService IO

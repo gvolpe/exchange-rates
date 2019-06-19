@@ -44,7 +44,7 @@ cacheNewResult' conn x from to ex = runRedis conn $ do
 cachedExchange' :: Connection -> Currency -> Currency -> IO (Maybe Exchange)
 cachedExchange' conn from to =
   runRedis conn (hget (BS.pack $ show from) (BS.pack $ show to)) <&> \case
-    Right (Just x) -> Just $ Exchange (read $ BS.unpack x :: Float)
+    Right (Just x) -> Just $ Exchange (read $ BS.unpack x :: Rational)
     _              -> Nothing
 
 -- Redis connection --
