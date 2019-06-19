@@ -26,10 +26,10 @@ library
                      , Data.Interface
                      , Domain.Currency
                      , Domain.Model
-                     , Http.Api
                      , Http.Client.Forex
                      , Http.Responses
                      , Http.Routes
+                     , Http.Server
                      , Logger
                      , Service.CachedForex
                      , Time

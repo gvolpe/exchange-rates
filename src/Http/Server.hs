@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, OverloadedStrings, TypeOperators #-}
 
-module Http.Api (runServer) where
+module Http.Server (runServer) where
 
 import           Control.Lens
 import           Data.Text
@@ -15,10 +15,10 @@ import           Servant
 import           Servant.API
 import           Servant.Swagger
 import           Service.CachedForex            ( ExchangeService(..) )
-import           Network.Wai
-import           Network.Wai.Handler.Warp
-import           Network.Wai.Middleware.Cors    (simpleCors)
-import           Utils                          (maybeToEither)
+import           Network.Wai                    ( Application )
+import           Network.Wai.Handler.Warp       ( run )
+import           Network.Wai.Middleware.Cors    ( simpleCors )
+import           Utils                          ( maybeToEither )
 
 type ApiVersion = "v1"
 

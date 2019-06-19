@@ -3,8 +3,8 @@ module Main where
 import           Cache.Redis                    ( mkRedisCache )
 import           Config
 import           Context
-import           Http.Api                       ( runServer )
 import           Http.Client.Forex              ( mkForexClient )
+import           Http.Server                    ( runServer )
 import           Logger                         ( defaultLogger )
 import           RIO                     hiding ( (>>>) )
 import           Service.CachedForex            ( mkExchangeService )
