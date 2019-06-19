@@ -6,9 +6,9 @@ import           Context
 import           Http.Client.Forex              ( mkForexClient )
 import           Http.Server                    ( runServer )
 import           Logger                         ( defaultLogger )
-import           RIO                     hiding ( (>>>) )
+import           RIO
 import           Service.CachedForex            ( mkExchangeService )
-import           Utils                          ( (>>>) )
+import           Utils                          ( tap )
 
 mkContext :: RIO Env (Ctx IO)
 mkContext = do
@@ -17,7 +17,7 @@ mkContext = do
 
 main :: IO ()
 main = do
-  env     <- Env <$> loadConfig >>> print
+  env     <- Env <$> loadConfig `tap` print
   ctx     <- runRIO env mkContext
   service <- runRIO ctx mkExchangeService
   runServer service
