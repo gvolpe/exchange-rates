@@ -31,7 +31,6 @@ import           Control.Monad.State
 import           Data.Functor                   ( void )
 import           Data.Map                       ( Map )
 import qualified Data.Map                      as Map
-import           Data.Maybe                     ( fromMaybe )
 import           Domain.Currency
 import           Domain.Model                   ( Expiration(..)
                                                 , Exchange(..)
@@ -82,30 +81,35 @@ testForexClient = ForexClient { callForex   = testCallForex
 testLogger :: Logger Eff
 testLogger = Logger (const unit)
 
+ctx :: Ctx Eff
+ctx = Ctx testLogger testCache testForexClient
+
 exService :: ReaderT (Ctx Eff) Eff (ExchangeService Eff)
 exService = mkExchangeService
 
-program
-  :: Ctx Eff
-  -> Cache Eff
-  -> Currency
-  -> Currency
-  -> Eff (Maybe Exchange, Exchange)
-program ctx cache from to = do
+program :: Currency -> Currency -> Eff (Maybe Exchange, Exchange)
+program from to = do
   service <- runReaderT exService ctx
-  cached  <- cachedExchange cache from to
+  cached  <- cachedExchange testCache from to
   rate    <- getRate service from to
   pure (cached, rate)
 
 prop_get_rates_st :: Property
 prop_get_rates_st = withTests 1000 $ property $ do
-  let cache = testCache
-  let ctx   = Ctx testLogger cache testForexClient
   from <- forAll $ Gen.element currencies
   to   <- forAll $ Gen.element currencies
-  let prg = program ctx cache from to
-  Right ((cached, rs), _) <- pure . join $ runExceptT (runStateT prg Map.empty)
-  rs === fromMaybe (Exchange 1.0) cached
+  let result = runExceptT (runStateT (program from to) Map.empty)
+  Right ((_, rs), _) <- pure . join $ result
+  rs === Exchange 1.0
+
+prop_get_cached_rates_st :: Property
+prop_get_cached_rates_st = withTests 1000 $ property $ do
+  from <- forAll $ Gen.element currencies
+  to   <- forAll $ Gen.element currencies
+  let st     = Map.fromList [((from, to), Exchange 2.0)]
+  let result = runExceptT (runStateT (program from to) st)
+  Right ((cached, _), _) <- pure . join $ result
+  cached === Just (Exchange 2.0)
 
 cachedForexServiceRST :: Group
 cachedForexServiceRST = $$(discover)
