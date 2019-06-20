@@ -63,11 +63,13 @@ test-Suite exchange-rates-tests
   hs-source-dirs:      test
   main-is:             Main.hs
   other-modules:       Rates.CachedForexTest
+                     , Rates.CachedForexRST
                      , Rates.UtilsTest
   build-depends:       base >= 4.7 && < 5
                      , containers
                      , exchange-rates
                      , hedgehog >= 1.0
+                     , mtl >= 2.2.2
                      , rio >= 0.1.9.2
                      , template-haskell
   default-language:     Haskell2010
