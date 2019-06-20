@@ -28,7 +28,6 @@ import           Context                        ( Ctx(..) )
 import           Control.Monad.Except
 import           Control.Monad.Reader
 import           Control.Monad.State
-import           Data.Functor                   ( void )
 import           Data.Map                       ( Map )
 import qualified Data.Map                      as Map
 import           Domain.Currency
@@ -57,7 +56,8 @@ type Error = SomeException
 type Eff = StateT RatesMap (ExceptT Error (Either Error))
 
 testCacheNewResult :: Expiration -> Currency -> Currency -> Exchange -> Eff ()
-testCacheNewResult _ from to rate = void $ Map.insert (from, to) rate <$> get
+testCacheNewResult _ from to rate =
+  get >>= \m -> put (Map.insert (from, to) rate m)
 
 testCachedExchange :: Currency -> Currency -> Eff (Maybe Exchange)
 testCachedExchange from to = do
@@ -84,15 +84,10 @@ testLogger = Logger (const unit)
 ctx :: Ctx Eff
 ctx = Ctx testLogger testCache testForexClient
 
-exService :: ReaderT (Ctx Eff) Eff (ExchangeService Eff)
-exService = mkExchangeService
-
 program :: Currency -> Currency -> Eff (Maybe Exchange, Exchange)
 program from to = do
-  service <- runReaderT exService ctx
-  cached  <- cachedExchange testCache from to
-  rate    <- getRate service from to
-  pure (cached, rate)
+  service <- runReaderT mkExchangeService ctx -- ReaderT (Ctx Eff) Eff (ExchangeService Eff)
+  (,) <$> cachedExchange testCache from to <*> getRate service from to
 
 prop_get_rates_st :: Property
 prop_get_rates_st = withTests 1000 $ property $ do
