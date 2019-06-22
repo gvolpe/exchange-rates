@@ -9,7 +9,7 @@ where
 import           Config
 import           Context
 import           Control.Monad.IO.Class         ( liftIO )
-import qualified Data.ByteString.Char8         as BS
+import qualified Data.ByteString.Char8         as C
 import           Data.Functor                   ( (<&>)
                                                 , void
                                                 )
@@ -37,14 +37,14 @@ cacheNewResult' conn x from to ex = runRedis conn $ do
   hset k f v
   void $ expire k (getExpiration x)
  where
-  k = BS.pack $ show from
-  f = BS.pack $ show to
-  v = BS.pack . show $ getExchange ex
+  k = C.pack $ show from
+  f = C.pack $ show to
+  v = C.pack . show $ getExchange ex
 
 cachedExchange' :: Connection -> Currency -> Currency -> IO (Maybe Exchange)
 cachedExchange' conn from to =
-  runRedis conn (hget (BS.pack $ show from) (BS.pack $ show to)) <&> \case
-    Right (Just x) -> Just $ Exchange (read $ BS.unpack x :: Rational)
+  runRedis conn (hget (C.pack $ show from) (C.pack $ show to)) <&> \case
+    Right (Just x) -> Just $ Exchange (read $ C.unpack x :: Rational)
     _              -> Nothing
 
 -- Redis connection --
