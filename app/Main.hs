@@ -1,8 +1,10 @@
 module Main where
 
 import           Cache.Redis                    ( mkRedisCache )
+import           Concurrency.Counter            ( mkCounter )
 import           Config
 import           Context
+import           Control.Monad.IO.Class         ( liftIO )
 import           Http.Client.Forex              ( mkForexClient )
 import           Http.Server                    ( runServer )
 import           Logger                         ( defaultLogger )
@@ -12,8 +14,9 @@ import           Utils                          ( tap )
 
 mkContext :: RIO Env (Ctx IO)
 mkContext = do
-  cache <- mkRedisCache
-  Ctx defaultLogger cache <$> mkForexClient
+  cache   <- mkRedisCache
+  counter <- liftIO mkCounter
+  Ctx defaultLogger cache counter <$> mkForexClient
 
 main :: IO ()
 main = do

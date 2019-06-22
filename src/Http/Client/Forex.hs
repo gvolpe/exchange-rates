@@ -24,7 +24,9 @@ import           Domain.Model                   ( ApiUsage
                                                 , Expiration(..)
                                                 )
 import           GHC.Generics                   ( Generic )
-import           GHC.Natural                    ( naturalToInteger )
+import           GHC.Natural                    ( naturalToInt
+                                                , naturalToInteger
+                                                )
 import           Network.Wreq
 import           RIO
 
@@ -32,7 +34,7 @@ instance FromJSON Exchange where
   parseJSON v = do
     j <- parseJSON v :: Parser (Map Text Value)
     case M.toList j of
-      [(_, x)] -> Exchange <$> (parseJSON x :: Parser Rational)
+      [(_, x)] -> Exchange <$> (parseJSON x :: Parser Float)
 
 instance FromJSON ApiUsage
 
@@ -43,6 +45,7 @@ mkForexClient =
           { callForex   = callForex' cfg
           , getApiUsage = getApiUsage' cfg
           , expiration  = Expiration (naturalToInteger $ keyExpiration cfg)
+          , reqPerHour  = naturalToInt $ requestsPerHour cfg
           }
         )
 

@@ -8,10 +8,17 @@ data Cache m = Cache
   , cachedExchange :: Currency -> Currency -> m (Maybe Exchange)
   }
 
+data Counter m = Counter
+  { incrCount :: m ()
+  , getCount :: m Int
+  , resetCount :: m ()
+  }
+
 data ForexClient m = ForexClient
   { callForex :: Currency -> Currency -> m Exchange
   , getApiUsage :: m ApiUsage
   , expiration :: Expiration
+  , reqPerHour :: Int
   }
 
 newtype ExchangeService m = ExchangeService

@@ -1,8 +1,7 @@
 {-# LANGUAGE BlockArguments, LambdaCase #-}
 
 module Cache.Redis
-  ( Cache(..)
-  , mkRedisCache
+  ( mkRedisCache
   )
 where
 
@@ -44,7 +43,7 @@ cacheNewResult' conn x from to ex = runRedis conn $ do
 cachedExchange' :: Connection -> Currency -> Currency -> IO (Maybe Exchange)
 cachedExchange' conn from to =
   runRedis conn (hget (C.pack $ show from) (C.pack $ show to)) <&> \case
-    Right (Just x) -> Just $ Exchange (read $ C.unpack x :: Rational)
+    Right (Just x) -> Just $ Exchange (read $ C.unpack x :: Float)
     _              -> Nothing
 
 -- Redis connection --

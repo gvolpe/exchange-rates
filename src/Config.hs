@@ -17,6 +17,7 @@ data ForexConfig = ForexConfig
   , apiPath :: Text
   , apiUsage :: Text
   , keyExpiration :: Natural
+  , requestsPerHour :: Natural
   } deriving (Generic)
 
 data RedisConfig = RedisConfig

@@ -20,6 +20,7 @@ extra-source-files:  CHANGELOG.md
 
 library
   exposed-modules:     Cache.Redis
+                     , Concurrency.Counter
                      , Concurrency.RateLimiter
                      , Config
                      , Context

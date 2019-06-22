@@ -7,6 +7,7 @@ import           Config                         ( AppConfig(..)
                                                 , RedisConfig
                                                 )
 import           Data.Interface                 ( Cache
+                                                , Counter
                                                 , ForexClient
                                                 )
 import           Logger                         ( Logger )
@@ -15,6 +16,7 @@ import           RIO
 data Ctx m = Ctx
   { getLogger :: Logger m
   , getCache :: Cache m
+  , getCounter :: Counter m
   , getForexClient :: ForexClient m
   }
 
@@ -31,6 +33,12 @@ class HasCache ctx m | ctx -> m where
 
 instance Monad m => HasCache (Ctx m) m where
   cacheL = lens getCache (\x y -> x { getCache = y })
+
+class HasCounter ctx m | ctx -> m where
+  counterL :: Lens' ctx (Counter m)
+
+instance Monad m => HasCounter (Ctx m) m where
+  counterL = lens getCounter (\x y -> x { getCounter = y })
 
 class HasForexClient ctx m | ctx -> m where
   forexClientL :: Lens' ctx (ForexClient m)
