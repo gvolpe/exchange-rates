@@ -47,7 +47,7 @@ apiSwagger = toSwagger (Proxy :: Proxy RatesAPI)
 type API = SwaggerAPI :<|> RatesAPI
 
 exchangeServer :: ExchangeService IO -> Server API
-exchangeServer s = return apiSwagger :<|> Routes.rates s :<|> return currencies
+exchangeServer s = return apiSwagger :<|> Routes.rates s :<|> Routes.currencies
 
 api :: ExchangeService IO -> Application
 api s = serve (Proxy :: Proxy API) (exchangeServer s)

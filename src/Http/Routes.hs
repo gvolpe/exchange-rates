@@ -1,12 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Http.Routes
-  ( rates
+  ( currencies
+  , rates
   )
 where
 
 import           Control.Monad.IO.Class         ( liftIO )
 import           Domain.Currency                ( Currency )
+import qualified Domain.Currency               as C
 import           Domain.Model                   ( Exchange(..) )
 import           Http.Responses                 ( ExchangeResponse(..) )
 import           Servant
@@ -16,7 +18,8 @@ import           Service.CachedForex            ( ExchangeService(..)
                                                 )
 
 exchangeToResponse :: Currency -> Currency -> Exchange -> ExchangeResponse
-exchangeToResponse from to rate = ExchangeResponse (fromRational $ getExchange rate) from to
+exchangeToResponse from to rate =
+  ExchangeResponse (fromRational $ getExchange rate) from to
 
 rates
   :: ExchangeService IO
@@ -26,3 +29,6 @@ rates
 rates service (Just from) (Just to) =
   liftIO $ exchangeToResponse from to <$> getRate service from to
 rates _ _ _ = throwError $ err400 { errBody = "Invalid currencies" }
+
+currencies :: Handler [Currency]
+currencies = pure C.currencies
