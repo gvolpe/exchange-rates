@@ -4,7 +4,7 @@
 
 Querying a [rate-limited foreign currency exchange API](https://free.currencyconverterapi.com/) using [Redis](https://redis.io/) as a cache.
 
-- Number of Requests per Hour: 100
+- Number of Requests per Hour: 100 (See config file)
 
 ### Http Endpoints
 
@@ -21,7 +21,7 @@ Returns a list of the available currencies. Eg:
 Returns the current exchange rate, if available:
 
 ```json
-{"to":"GBP","from":"USD","rate":0.794065}
+{"to":"USD","from":"EUR","rate":1.139556}
 ```
 
 ### Run it locally
