@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Http.Routes
+module Http.Handler
   ( currencies
   , rates
   )

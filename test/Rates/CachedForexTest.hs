@@ -1,11 +1,10 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE LambdaCase, OverloadedStrings #-}
 
 module Rates.CachedForexTest
   ( cachedForexServiceTests
   )
 where
 
-import           Cache.Redis                    ( Cache(..) )
 import           Context                        ( Ctx(..) )
 import           Data.IORef
 import           Data.Map                       ( Map )
@@ -15,19 +14,25 @@ import           Domain.Currency
 import           Domain.Model                   ( Expiration(..)
                                                 , Exchange(..)
                                                 )
+import           Data.Interface                 ( Cache(..)
+                                                , Counter(..)
+                                                )
 import           Logger                         ( Logger(..) )
 import           Hedgehog
 import qualified Hedgehog.Gen                  as Gen
+import qualified Hedgehog.Range                as Range
 import           Http.Client.Forex              ( ForexClient(..) )
 import           Prelude                 hiding ( head
                                                 , last
                                                 )
-import           RIO                     hiding ( atomicModifyIORef
+import           RIO                     hiding ( assert
+                                                , atomicModifyIORef
                                                 , newIORef
                                                 , readIORef
                                                 , to
                                                 )
-import           Service.CachedForex            ( ExchangeService(..)
+import           Service.CachedForex            ( ApiLimitReachedException(..)
+                                                , ExchangeService(..)
                                                 , mkExchangeService
                                                 )
 import           Utils                          ( unit )
@@ -55,24 +60,34 @@ mkTestCache =
 testCallForex :: Currency -> Currency -> IO Exchange
 testCallForex _ _ = pure $ Exchange 1.0
 
-testForexClient :: ForexClient IO
-testForexClient = ForexClient { callForex   = testCallForex
-                              , getApiUsage = undefined
-                              , expiration  = undefined
-                              }
+mkTestForexClient :: Int -> ForexClient IO
+mkTestForexClient rph = ForexClient { callForex   = testCallForex
+                                    , getApiUsage = undefined
+                                    , expiration  = undefined
+                                    , reqPerHour  = rph
+                                    }
 
 testLogger :: Logger IO
 testLogger = Logger (const unit)
 
+mkTestCounter :: Int -> Counter IO
+mkTestCounter c =
+  Counter { incrCount = unit, getCount = pure c, resetCount = unit }
+
+type TryRate = IO (Either ApiLimitReachedException Exchange)
+
 prop_get_rates :: Cache IO -> Property
 prop_get_rates cache = withTests 1000 $ property $ do
-  let ctx = Ctx testLogger cache testForexClient
+  rph   <- forAll $ Gen.int (Range.linear 0 10)
+  count <- forAll $ Gen.int (Range.linear 0 10)
+  let ctx = Ctx testLogger cache (mkTestCounter count) (mkTestForexClient rph)
   service <- evalIO $ runRIO ctx mkExchangeService
   from    <- forAll $ Gen.element currencies
   to      <- forAll $ Gen.element currencies
   cached  <- evalIO $ cachedExchange cache from to
-  result  <- evalIO $ getRate service from to
-  result === fromMaybe (Exchange 1.0) cached
+  evalIO (try (getRate service from to) :: TryRate) >>= \case
+    Right rs -> rs === fromMaybe (Exchange 1.0) cached
+    Left  _  -> assert (count >= rph)
 
 cachedForexServiceTests :: IO Group
 cachedForexServiceTests =

@@ -23,7 +23,6 @@ module Rates.CachedForexRST
   )
 where
 
-import           Cache.Redis                    ( Cache(..) )
 import           Context                        ( Ctx(..) )
 import           Control.Monad.Except
 import           Control.Monad.Reader
@@ -33,6 +32,9 @@ import qualified Data.Map                      as Map
 import           Domain.Currency
 import           Domain.Model                   ( Expiration(..)
                                                 , Exchange(..)
+                                                )
+import           Data.Interface                 ( Cache(..)
+                                                , Counter(..)
                                                 )
 import           Logger                         ( Logger(..) )
 import           Hedgehog
@@ -76,13 +78,20 @@ testForexClient :: ForexClient Eff
 testForexClient = ForexClient { callForex   = testCallForex
                               , getApiUsage = undefined
                               , expiration  = undefined
+                              , reqPerHour  = 100
                               }
 
 testLogger :: Logger Eff
 testLogger = Logger (const unit)
 
+testCounter :: Counter Eff
+testCounter = Counter { incrCount  = unit
+                      , getCount   = pure 1
+                      , resetCount = unit
+                      }
+
 ctx :: Ctx Eff
-ctx = Ctx testLogger testCache testForexClient
+ctx = Ctx testLogger testCache testCounter testForexClient
 
 program :: Currency -> Currency -> Eff (Maybe Exchange, Exchange)
 program from to = do

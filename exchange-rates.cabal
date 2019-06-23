@@ -28,8 +28,8 @@ library
                      , Domain.Currency
                      , Domain.Model
                      , Http.Client.Forex
+                     , Http.Handler
                      , Http.Responses
-                     , Http.Routes
                      , Http.Server
                      , Logger
                      , Service.CachedForex

@@ -9,7 +9,7 @@ import           Data.Monoid                    ( (<>) )
 import           Data.Proxy
 import           Data.Swagger
 import           Domain.Currency
-import qualified Http.Routes                   as Routes
+import qualified Http.Handler                   as Handler
 import           Http.Responses
 import           Servant
 import           Servant.API
@@ -47,7 +47,7 @@ apiSwagger = toSwagger (Proxy :: Proxy RatesAPI)
 type API = SwaggerAPI :<|> RatesAPI
 
 exchangeServer :: ExchangeService IO -> Server API
-exchangeServer s = return apiSwagger :<|> Routes.rates s :<|> Routes.currencies
+exchangeServer s = return apiSwagger :<|> Handler.rates s :<|> Handler.currencies
 
 api :: ExchangeService IO -> Application
 api s = serve (Proxy :: Proxy API) (exchangeServer s)
