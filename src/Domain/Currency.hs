@@ -1,13 +1,13 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Domain.Currency where
 
+import           Data.Aeson
 import           Data.List                      ( elemIndex )
 import           Data.Text                      ( Text
                                                 , toUpper
                                                 , pack
                                                 )
-import           Data.Typeable                  ( Typeable )
 import           GHC.Generics                   ( Generic )
 
 data Currency = AED | AFN | ALL | AMD | ANG | AOA | ARS | AUD | AWG | AZN
@@ -24,7 +24,10 @@ data Currency = AED | AFN | ALL | AMD | ANG | AOA | ARS | AUD | AWG | AZN
   | SLL | SOS | SRD | STD | SVC | SYP | SZL | THB | TJS | TMT | TND | TOP
   | TRY | TTD | TWD | TZS | UAH | UGX | USD | UYU | UZS | VEF | VND | VUV
   | WST | XAF | XAG | XCD | XDR | XOF | XPF | YER | ZAR | ZMK | ZMW | ZWL
-  deriving (Enum, Generic, Eq, Ord, Show, Typeable)
+  deriving (Enum, Generic, Eq, Ord, Show)
+
+instance FromJSON Currency
+instance ToJSON Currency
 
 currencies :: [Currency]
 currencies = enumFrom AED

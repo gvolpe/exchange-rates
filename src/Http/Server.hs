@@ -22,7 +22,6 @@ import           Utils                          ( maybeToEither )
 
 type ApiVersion = "v1"
 
-instance FromJSON Currency
 instance ToParamSchema Currency
 instance ToSchema Currency
 instance ToSchema ExchangeResponse

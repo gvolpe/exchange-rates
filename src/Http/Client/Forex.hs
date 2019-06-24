@@ -11,32 +11,18 @@ import           Context
 import           Control.Lens            hiding ( (^.)
                                                 , view
                                                 )
-import           Data.Aeson              hiding ( Options )
-import           Data.Aeson.Types        hiding ( Options )
+import           Data.Aeson                     ( FromJSON )
 import           Data.Interface                 ( ForexClient(..) )
-import           Data.Map                       ( Map )
-import qualified Data.Map                      as M
 import           Data.Monoid                    ( (<>) )
 import           Data.Text
 import           Domain.Currency                ( Currency )
-import           Domain.Model                   ( ApiUsage
-                                                , Exchange(..)
-                                                , Expiration(..)
-                                                )
+import           Domain.Model
 import           GHC.Generics                   ( Generic )
 import           GHC.Natural                    ( naturalToInt
                                                 , naturalToInteger
                                                 )
 import           Network.Wreq
 import           RIO
-
-instance FromJSON Exchange where
-  parseJSON v = do
-    j <- parseJSON v :: Parser (Map Text Value)
-    case M.toList j of
-      [(_, x)] -> Exchange <$> (parseJSON x :: Parser Float)
-
-instance FromJSON ApiUsage
 
 mkForexClient :: HasForexConfig ctx => RIO ctx (ForexClient IO)
 mkForexClient =
