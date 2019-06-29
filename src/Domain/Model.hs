@@ -5,10 +5,11 @@ module Domain.Model where
 import           Data.Aeson
 import           Data.Aeson.Types
 import           Data.Map                       ( Map )
-import qualified Data.Map                      as M
 import           Data.Text                      ( Text )
 import           Domain.Currency
 import           GHC.Generics                   ( Generic )
+
+import qualified Data.Map                      as M
 
 data ApiUsage = ApiUsage
   { timestamp :: String

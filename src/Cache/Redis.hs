@@ -8,7 +8,6 @@ where
 import           Config
 import           Context
 import           Control.Monad.IO.Class         ( liftIO )
-import qualified Data.ByteString.Char8         as C
 import           Data.Functor                   ( (<&>)
                                                 , void
                                                 )
@@ -21,6 +20,8 @@ import           Domain.Model                   ( Exchange(..)
                                                 )
 import           GHC.Natural                    ( naturalToInteger )
 import           RIO
+
+import qualified Data.ByteString.Char8         as C
 
 mkRedisCache :: HasRedisConfig env => RIO env (Cache IO)
 mkRedisCache = do

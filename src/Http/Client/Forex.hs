@@ -30,8 +30,8 @@ mkForexClient =
     <&> (\cfg -> ForexClient
           { callForex   = callForex' cfg
           , getApiUsage = getApiUsage' cfg
-          , expiration  = Expiration (naturalToInteger $ keyExpiration cfg)
-          , reqPerHour  = naturalToInt $ requestsPerHour cfg
+          , expiration  = Expiration (naturalToInteger $ apiKeyExpiration cfg)
+          , reqPerHour  = naturalToInt $ apiReqPerHour cfg
           }
         )
 

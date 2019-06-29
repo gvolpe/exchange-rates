@@ -9,7 +9,6 @@ where
 import           Control.Monad.IO.Class         ( liftIO )
 import           Control.Monad.Catch            ( handle )
 import           Domain.Currency                ( Currency )
-import qualified Domain.Currency               as C
 import           Domain.Model                   ( Exchange(..) )
 import           Http.Responses                 ( ExchangeResponse(..) )
 import           Servant
@@ -18,6 +17,8 @@ import           Service.CachedForex            ( ApiLimitReachedException(..)
                                                 , ExchangeService(..)
                                                 , mkExchangeService
                                                 )
+
+import qualified Domain.Currency               as C
 
 exchangeToResponse :: Currency -> Currency -> Exchange -> ExchangeResponse
 exchangeToResponse from to rate = ExchangeResponse (getExchange rate) from to

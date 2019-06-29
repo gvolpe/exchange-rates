@@ -16,8 +16,8 @@ data ForexConfig = ForexConfig
   , apiKey :: ApiKey
   , apiPath :: Text
   , apiUsage :: Text
-  , keyExpiration :: Natural
-  , requestsPerHour :: Natural
+  , apiKeyExpiration :: Natural
+  , apiReqPerHour :: Natural
   } deriving (Generic)
 
 data RedisConfig = RedisConfig
@@ -35,7 +35,7 @@ instance Show ForexConfig where
     "ForexConfig {host = \""
       ++ unpack (apiHost c <> apiPath c)
       ++ "\", apiKey = [SECRET], keyExpiration = "
-      ++ show (keyExpiration c)
+      ++ show (apiKeyExpiration c)
       ++ "}"
 
 instance Interpret ForexConfig

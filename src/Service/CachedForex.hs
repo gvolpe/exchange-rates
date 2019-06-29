@@ -8,7 +8,7 @@ module Service.CachedForex
 where
 
 import           Config                         ( ForexConfig
-                                                , keyExpiration
+                                                , apiKeyExpiration
                                                 )
 import           Context
 import           Control.Lens                   ( view )

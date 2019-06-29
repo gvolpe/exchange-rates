@@ -9,7 +9,6 @@ import           Data.Monoid                    ( (<>) )
 import           Data.Proxy
 import           Data.Swagger
 import           Domain.Currency
-import qualified Http.Handler                   as Handler
 import           Http.Responses
 import           Servant
 import           Servant.API
@@ -19,6 +18,8 @@ import           Network.Wai                    ( Application )
 import           Network.Wai.Handler.Warp       ( run )
 import           Network.Wai.Middleware.Cors    ( simpleCors )
 import           Utils                          ( maybeToEither )
+
+import qualified Http.Handler                   as Handler
 
 type ApiVersion = "v1"
 
