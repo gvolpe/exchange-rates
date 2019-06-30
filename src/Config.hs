@@ -18,17 +18,17 @@ data ForexConfig = ForexConfig
   , apiUsage :: Text
   , apiKeyExpiration :: Natural
   , apiReqPerHour :: Natural
-  } deriving (Generic)
+  } deriving Generic
 
 data RedisConfig = RedisConfig
   { redisHost :: Text
   , redisPort :: Natural
-  } deriving (Show, Generic)
+  } deriving (Generic, Show)
 
 data AppConfig = AppConfig
   { forex :: ForexConfig
   , redis :: RedisConfig
-  } deriving (Show, Generic)
+  } deriving (Generic, Show)
 
 instance Show ForexConfig where
   show c =

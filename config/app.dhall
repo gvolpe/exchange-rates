@@ -11,8 +11,8 @@ let makeForexConfig = λ(env : Env) →
   , apiKey = "${env:FOREX_API_KEY as Text}"
   , apiPath = "/api/v7"
   , apiUsage = "/others/usage"
-  , keyExpiration = 60 * 60 -- 1 hour in seconds
-  , requestsPerHour = 100
+  , apiKeyExpiration = 60 * 60 -- 1 hour in seconds
+  , apiReqPerHour = 100
   }
 
 let makeRedisConfig = λ(env : Env) →
