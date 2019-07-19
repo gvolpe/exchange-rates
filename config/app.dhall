@@ -11,7 +11,7 @@ let makeForexConfig = λ(env : Env) →
   , apiKey = "${env:FOREX_API_KEY as Text}"
   , apiPath = "/api/v7"
   , apiUsage = "/others/usage"
-  , apiKeyExpiration = 60 * 60 -- 1 hour in seconds
+  , apiKeyExpiration = 3600 -- 1 hour in seconds
   , apiReqPerHour = 100
   }
 

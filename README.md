@@ -29,7 +29,7 @@ Returns the current exchange rate, if available:
 You'll need a Redis instance. The easiest way to get started is by using `docker`:
 
 ```
-docker run -p 6379:6379 redis:5.0.0
+docker run -it --rm -p 6379:6379 redis:5.0.0
 ```
 
 And then run the web server app using `cabal new-run exchange-rates`, you should see something like:

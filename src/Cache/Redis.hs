@@ -48,6 +48,7 @@ cachedExchange' conn from to =
     _              -> Nothing
 
 -- Redis connection --
+connInfo :: RedisConfig -> ConnectInfo
 connInfo c = defaultConnectInfo
   { connectHost = unpack $ redisHost c
   , connectPort = PortNumber (fromInteger . naturalToInteger $ redisPort c)
