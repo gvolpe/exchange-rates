@@ -1,7 +1,7 @@
 { mkDerivation, aeson, base, bytestring, containers, dhall
 , exceptions, hedgehog, hedis, lens, mtl, refined, rio, servant
 , servant-server, servant-swagger, stdenv, swagger2
-, template-haskell, text, transient, wai, wai-cors, warp, wreq
+, template-haskell, text, wai, wai-cors, warp, wreq
 }:
 mkDerivation {
   pname = "exchange-rates";
@@ -12,11 +12,9 @@ mkDerivation {
   libraryHaskellDepends = [
     aeson base bytestring containers dhall exceptions hedis lens mtl
     refined rio servant servant-server servant-swagger swagger2 text
-    transient wai wai-cors warp wreq
+    wai wai-cors warp wreq
   ];
-  executableHaskellDepends = [
-    base refined rio template-haskell transient
-  ];
+  executableHaskellDepends = [ base refined rio template-haskell ];
   testHaskellDepends = [
     base containers hedgehog mtl rio template-haskell
   ];
