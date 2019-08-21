@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Http.Handler
   ( currencies
@@ -21,18 +21,18 @@ import           Service.CachedForex            ( ApiLimitReachedException(..)
 import qualified Domain.Currency               as C
 
 exchangeToResponse :: Currency -> Currency -> Exchange -> ExchangeResponse
-exchangeToResponse from to rate = ExchangeResponse (getExchange rate) from to
+exchangeToResponse from to Exchange {..} = ExchangeResponse getExchange from to
 
 rates
   :: ExchangeService IO
   -> Maybe Currency
   -> Maybe Currency
   -> Handler ExchangeResponse
-rates service (Just from) (Just to) = handle
+rates ExchangeService {..} (Just from) (Just to) = handle
   (\ApiLimitReached ->
     throwError $ err503 { errBody = "Api limit has been reached" }
   )
-  (liftIO $ exchangeToResponse from to <$> getRate service from to)
+  (liftIO $ exchangeToResponse from to <$> getRate from to)
 rates _ _ _ = throwError $ err400 { errBody = "Invalid currencies" }
 
 currencies :: Handler [Currency]

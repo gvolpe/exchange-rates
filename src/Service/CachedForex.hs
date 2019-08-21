@@ -1,4 +1,4 @@
-{-# LANGUAGE BlockArguments, LambdaCase #-}
+{-# LANGUAGE BlockArguments, LambdaCase, RecordWildCards #-}
 
 module Service.CachedForex
   ( ApiLimitReachedException(..)
@@ -61,19 +61,17 @@ getRate'
   -> Currency
   -> Currency
   -> m Exchange
-getRate' l counter cache client from to =
-  cachedExchange cache from to >>= \case
-    Just x  -> logInfo l ("Cache hit: " <> showEx from to) >> pure x
-    Nothing -> (getCount counter <&> (< limit)) >>= \case
+getRate' Logger {..} Counter {..} Cache {..} ForexClient {..} from to =
+  cachedExchange from to >>= \case
+    Just x  -> logInfo ("Cache hit: " <> showEx from to) >> pure x
+    Nothing -> (getCount <&> (< reqPerHour)) >>= \case
       True -> do
-        logInfo l $ "Calling web service for: " <> showEx from to
-        bracket remoteCall cacheResult pure `finally` incrCount counter
+        logInfo $ "Calling web service for: " <> showEx from to
+        bracket remoteCall cacheResult pure `finally` incrCount
       False -> throwM ApiLimitReached
      where
-      exp         = expiration client
-      limit       = reqPerHour client
-      remoteCall  = callForex client from to
-      cacheResult = cacheNewResult cache exp from to
+      remoteCall  = callForex from to
+      cacheResult = cacheNewResult expiration from to
 
 showEx :: Currency -> Currency -> String
 showEx from to = show from <> " -> " <> show to

@@ -1,4 +1,5 @@
-{-# LANGUAGE OverloadedStrings, RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables    #-}
 
 module Http.Client.Forex
   ( ForexClient(..)
@@ -36,17 +37,17 @@ mkForexClient =
         )
 
 callForex' :: ForexConfig -> Currency -> Currency -> IO Exchange
-callForex' c from to =
-  let url = apiHost c <> apiPath c <> "/convert"
+callForex' ForexConfig {..} from to =
+  let url = apiHost <> apiPath <> "/convert"
       exc = param "q" .~ [pack $ show from <> "_" <> show to]
-      key = param "apiKey" .~ [apiKey c]
+      key = param "apiKey" .~ [apiKey]
       ops = defaults & exc & param "compact" .~ ["ultra"] & key
   in  req ops url
 
 getApiUsage' :: ForexConfig -> IO ApiUsage
-getApiUsage' c =
-  let url = apiHost c <> apiUsage c
-      ops = defaults & param "apiKey" .~ [apiKey c]
+getApiUsage' ForexConfig {..} =
+  let url = apiHost <> apiUsage
+      ops = defaults & param "apiKey" .~ [apiKey]
   in  req ops url
 
 req :: forall a . FromJSON a => Options -> Text -> IO a

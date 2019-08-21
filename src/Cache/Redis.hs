@@ -1,4 +1,4 @@
-{-# LANGUAGE BlockArguments, LambdaCase #-}
+{-# LANGUAGE BlockArguments, LambdaCase, RecordWildCards #-}
 
 module Cache.Redis
   ( mkRedisCache
@@ -33,13 +33,13 @@ mkRedisCache = do
 
 cacheNewResult'
   :: Connection -> Expiration -> Currency -> Currency -> Exchange -> IO ()
-cacheNewResult' conn x from to ex = runRedis conn $ do
+cacheNewResult' conn Expiration {..} from to Exchange {..} = runRedis conn $ do
   hset k f v
-  void $ expire k (getExpiration x)
+  void $ expire k getExpiration
  where
   k = C.pack $ show from
   f = C.pack $ show to
-  v = C.pack . show $ getExchange ex
+  v = C.pack . show $ getExchange
 
 cachedExchange' :: Connection -> Currency -> Currency -> IO (Maybe Exchange)
 cachedExchange' conn from to =
@@ -49,9 +49,9 @@ cachedExchange' conn from to =
 
 -- Redis connection --
 connInfo :: RedisConfig -> ConnectInfo
-connInfo c = defaultConnectInfo
-  { connectHost = unpack $ redisHost c
-  , connectPort = PortNumber (fromInteger . naturalToInteger $ redisPort c)
+connInfo RedisConfig {..} = defaultConnectInfo
+  { connectHost = unpack redisHost
+  , connectPort = PortNumber (fromInteger . naturalToInteger $ redisPort)
   }
 
 redisConnect :: RedisConfig -> IO Connection
