@@ -11,8 +11,8 @@ mkDerivation {
   isExecutable = true;
   libraryHaskellDepends = [
     aeson base bytestring containers dhall exceptions hedis lens mtl
-    refined rio servant servant-server servant-swagger swagger2 text
-    wai wai-cors warp wreq
+    refined rio servant servant-server servant-swagger swagger2
+    template-haskell text wai wai-cors warp wreq
   ];
   executableHaskellDepends = [ base refined rio template-haskell ];
   testHaskellDepends = [
